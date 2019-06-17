@@ -17,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 import java.util.Collections;
@@ -44,7 +45,7 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity authenticateUser(@Valid @RequestBody LoginPayload loginPayload) {
+    public ResponseEntity authenticateUser( @Valid @RequestBody LoginPayload loginPayload) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginPayload.getEmail(),
@@ -57,7 +58,7 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity registerUser(@Valid @RequestBody RegisterPayload registerPayload) {
-        if (userRepository.existsUserByEmail(registerPayload.getEmail())) {
+        if (userRepository.findByEmail(registerPayload.getEmail()) != null) {
             return ResponseEntity.badRequest().body(new ApiPayload(false, "Email Address already in use!"));
         }
 
