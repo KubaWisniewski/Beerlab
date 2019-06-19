@@ -8,20 +8,18 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
 @Data
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Beer {
+public class Order {
     @Id
     @GeneratedValue
     private Long id;
-    private String description;
-    private String imgUrl;
-    private String brand;
-    private Double price;
-    private Integer quantity;
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "order_id")
-    private Order order;
+    @ManyToOne()
+    @JoinColumn(name = "user_id")
+    private User user;
+    @OneToMany(mappedBy = "order", fetch = FetchType.EAGER)
+    private Set<Beer> beers = new HashSet<>();
+
 }
