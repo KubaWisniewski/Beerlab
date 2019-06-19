@@ -30,9 +30,9 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
     private Double balance;
-    /*
+    
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
     private Set<Order> orders = new HashSet<>();
-    */
-     
+
+
 }

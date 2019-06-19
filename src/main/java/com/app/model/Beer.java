@@ -23,9 +23,9 @@ public class Beer {
     private String brand;
     private Double price;
     private Integer quantity;
-    /*
+
     @ManyToOne
     @JoinColumn(name = "order_id")
     private Order order;
-    */
+
 }
