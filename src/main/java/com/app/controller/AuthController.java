@@ -24,8 +24,9 @@ import java.util.Collections;
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin
 public class AuthController {
-    private AuthenticationManager authenticationManager;    
+    private AuthenticationManager authenticationManager;
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
@@ -45,7 +46,7 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity authenticateUser( @Valid @RequestBody LoginPayload loginPayload) {
+    public ResponseEntity authenticateUser(@Valid @RequestBody LoginPayload loginPayload) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginPayload.getEmail(),
