@@ -3,6 +3,7 @@ package com.app.controller;
 import com.app.security.CurrentUser;
 import com.app.security.UserPrincipal;
 import com.app.service.UserService;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
