@@ -17,14 +17,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 import java.util.Collections;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin
 public class AuthController {
     private AuthenticationManager authenticationManager;
     private UserRepository userRepository;
@@ -54,7 +52,7 @@ public class AuthController {
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = tokenProvider.generateToken(authentication);
-        return ResponseEntity.ok().body(JwtAuthenticationPayload.builder().accessToken(jwt).tokenType("Bearer").build());
+        return ResponseEntity.ok().header("Authorization", "Bearer " + jwt).body(JwtAuthenticationPayload.builder().accessToken(jwt).tokenType("Bearer").build());
     }
 
     @PostMapping("/signup")
