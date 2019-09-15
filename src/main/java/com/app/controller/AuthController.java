@@ -52,7 +52,7 @@ public class AuthController {
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = tokenProvider.generateToken(authentication);
-        return ResponseEntity.ok().header("Authorization", "Bearer " + jwt).body(JwtAuthenticationPayload.builder().accessToken(jwt).tokenType("Bearer").build());
+        return ResponseEntity.ok().header("Authorization", "Bearer " + jwt).body(JwtAuthenticationPayload.builder().accessToken(jwt).tokenType("Bearer").user(userRepository.findByEmail(loginPayload.getEmail())).build());
     }
 
     @PostMapping("/signup")
