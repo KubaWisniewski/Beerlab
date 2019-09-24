@@ -19,11 +19,12 @@ public class Order {
     @Id
     @GeneratedValue
     private Long id;
-
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id")
     private User user;
     @OneToMany(mappedBy = "order", fetch = FetchType.EAGER)
-    private Set<Beer> beers = new HashSet<>();
+    private Set<OrderItem> orderItems = new HashSet<>();
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
 
 }

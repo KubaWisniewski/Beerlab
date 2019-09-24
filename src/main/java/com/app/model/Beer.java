@@ -24,8 +24,7 @@ public class Beer {
     private Double price;
     private Integer quantity;
 
-    @ManyToOne
-    @JoinColumn(name = "order_id")
-    private Order order;
+    @OneToMany(mappedBy = "order", fetch = FetchType.EAGER)
+    private Set<OrderItem> orderItems = new HashSet<>();
 
 }

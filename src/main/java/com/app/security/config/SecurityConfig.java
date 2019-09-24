@@ -2,7 +2,7 @@ package com.app.security.config;
 
 import com.app.security.JwtAuthenticationEntryPoint;
 import com.app.security.JwtAuthenticationFilter;
-import com.app.security.UserDetailsServiceImpl;
+import com.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,21 +17,20 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
-    private UserDetailsServiceImpl userDetailsServiceImpl;
+    private UserService userService;
 
     @Autowired
     private JwtAuthenticationEntryPoint unauthorizedHandler;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsServiceImpl).passwordEncoder(passwordEncoder());
+        auth.userDetailsService(userService).passwordEncoder(passwordEncoder());
     }
 
     @Override

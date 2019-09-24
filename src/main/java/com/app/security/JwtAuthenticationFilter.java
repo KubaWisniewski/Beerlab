@@ -1,5 +1,6 @@
 package com.app.security;
 
+import com.app.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private JwtTokenProvider tokenProvider;
 
     @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+    private UserService userService;
 
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
@@ -33,7 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
                 Long userId = tokenProvider.getUserIdFromJWT(jwt);
 
-                UserDetails userDetails = userDetailsService.loadUserById(userId);
+                UserDetails userDetails = userService.loadUserById(userId);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
