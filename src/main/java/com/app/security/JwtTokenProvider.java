@@ -22,13 +22,13 @@ public class JwtTokenProvider {
 
     public String generateToken(Authentication authentication) {
 
-        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
 
         return Jwts.builder()
-                .setSubject(Long.toString(userPrincipal.getId()))
+                .setSubject(Long.toString(customUserDetails.getId()))
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
@@ -56,7 +56,7 @@ public class JwtTokenProvider {
         } catch (UnsupportedJwtException ex) {
             logger.error("Unsupported JWT token");
         } catch (IllegalArgumentException ex) {
-
+            logger.error("JWT claims string is empty.");
         }
         return false;
     }

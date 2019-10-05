@@ -1,5 +1,6 @@
 package com.app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Data
@@ -23,9 +25,21 @@ public class Beer {
     private String brand;
     private Double price;
     private Integer quantity;
+    @JsonIgnore
+    @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST)
+    private Set<OrderItem> orderItems = new HashSet<>();
 
-    @ManyToOne
-    @JoinColumn(name = "order_id")
-    private Order order;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Beer beer = (Beer) o;
+        return Objects.equals(id, beer.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

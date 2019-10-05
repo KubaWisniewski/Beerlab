@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
+
     private UserRepository userRepository;
 
     public UserService(UserRepository userRepository) {
@@ -14,4 +15,5 @@ public class UserService {
     public Double getUserBalance(Long id) {
         return userRepository.getOne(id).getBalance();
     }
+
 }
