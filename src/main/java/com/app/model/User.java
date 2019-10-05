@@ -1,5 +1,7 @@
 package com.app.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -7,32 +9,31 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
+@Entity(name = "user")
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
-@Entity
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
     @Id
     @GeneratedValue
     private Long id;
 
+    @Column(name = "username")
     @NotBlank
-    @NotNull
     private String username;
 
-    @Column(unique = true)
+    @Column(name = "email", unique = true)
+    @NotBlank
     private String email;
 
-    @NotNull
+    @Column(name = "password")
+    @NotBlank
     private String password;
-
-    private LocalDate dataOfBirth;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",
@@ -40,8 +41,32 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
+    @Column(name="balance")
     private Double balance;
-
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
+    @JsonBackReference
+    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "user")
     private Set<Order> orders = new HashSet<>();
+
+    public User(User user) {
+        id=user.getId();
+        username=user.getUsername();
+        email=user.getEmail();
+        password=user.getPassword();
+        roles=user.getRoles();
+        balance=user.getBalance();
+        orders=user.getOrders();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

@@ -6,6 +6,7 @@ import com.app.model.OrderItem;
 import com.app.model.OrderStatus;
 import com.app.repository.BeerRepository;
 import com.app.repository.OrderRepository;
+import com.app.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -14,10 +15,12 @@ import java.util.Optional;
 public class OrderService {
     private OrderRepository orderRepository;
     private BeerRepository beerRepository;
+    private UserRepository userRepository;
+    public OrderService(OrderRepository orderRepository, BeerRepository beerRepository, UserRepository userRepository) {
 
-    public OrderService(OrderRepository orderRepository, BeerRepository beerRepository) {
         this.orderRepository = orderRepository;
         this.beerRepository = beerRepository;
+        this.userRepository = userRepository;
     }
 
     public Order getActualOrder(Long userId) {
@@ -32,7 +35,7 @@ public class OrderService {
 
         Order order = getActualOrder(userId);
         if (order == null) {
-            createOrder(userId);
+            order = createOrder(userId);
         }
         Optional<Beer> beerTmp = beerRepository.findById(beer.getId());
         OrderItem orderItem = OrderItem.builder().order(order).beer(beerTmp.get()).build();
@@ -43,6 +46,7 @@ public class OrderService {
 
     public Order createOrder(Long userId) {
         Order order = new Order();
+        order.setUser(userRepository.findById(userId).get());
         order.setStatus(OrderStatus.INPROGRESS);
         orderRepository.save(order);
         return order;

@@ -4,11 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import javax.persistence.*;
+import static javax.persistence.EnumType.STRING;
 
-@Data
 @Entity
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,6 +16,8 @@ public class Role {
     @Id
     @GeneratedValue
     private Long id;
-    @Enumerated(EnumType.STRING)
+
+    @Column(name = "role_name")
+    @Enumerated(value = STRING)
     private RoleName roleName;
 }

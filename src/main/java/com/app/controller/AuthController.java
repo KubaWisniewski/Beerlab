@@ -47,12 +47,12 @@ public class AuthController {
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = tokenProvider.generateToken(authentication);
-        return ResponseEntity.ok().header("Authorization", "Bearer " + jwt).body(JwtAuthenticationPayload.builder().accessToken(jwt).tokenType("Bearer").user(userRepository.findByEmail(loginPayload.getEmail())).build());
+        return ResponseEntity.ok().header("Authorization", "Bearer " + jwt).body(JwtAuthenticationPayload.builder().accessToken(jwt).tokenType("Bearer").user(userRepository.findByEmail(loginPayload.getEmail()).get()).build());
     }
 
     @PostMapping("/signup")
     public ResponseEntity registerUser(@Valid @RequestBody RegisterPayload registerPayload) {
-        if (userRepository.findByEmail(registerPayload.getEmail()) != null) {
+        if (userRepository.findByEmail(registerPayload.getEmail()).isPresent()) {
             return ResponseEntity.badRequest().body(new ApiPayload(false, "Email Address already in use!"));
         }
 
@@ -62,7 +62,7 @@ public class AuthController {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         Role userRole = roleRepository.findByRoleName(RoleName.ROLE_USER);
         user.setRoles(Collections.singleton(userRole));
-        User result = userRepository.save(user);
+        userRepository.save(user);
 
         return ResponseEntity.ok().body(new ApiPayload(true, "User registered successfully"));
     }
