@@ -32,6 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsServiceImpl).passwordEncoder(passwordEncoder());
+
     }
 
     @Override
@@ -50,7 +51,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/", "/favicon.ico", "/**/*.png", "/**/*.gif", "/**/*.svg", "/**/*.jpg", "/**/*.html", "/**/*.css", "/**/*.js")
                 .permitAll()
-                .antMatchers("/api/auth/signin", "/api/auth/signup", "/swagger-resources/**", "/swagger-ui.html/**", "/v2/api-docs", "/api/beer")
+                .antMatchers("/api/auth/signin", "/api/auth/signup", "/swagger-resources/**", "/swagger-ui.html/**", "/v2/api-docs", "/api/beer", "/h2-console/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
@@ -59,6 +60,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .clearAuthentication(true)
                 .permitAll();
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+
+        http.authorizeRequests().antMatchers("/").permitAll().and()
+                .authorizeRequests().antMatchers("/console/**").permitAll();
+        http.csrf().disable();
+        http.headers().frameOptions().disable();
+
     }
 
     @Bean
