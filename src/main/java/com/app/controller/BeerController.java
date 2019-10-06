@@ -2,8 +2,10 @@ package com.app.controller;
 
 import com.app.model.Beer;
 import com.app.service.BeerService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import java.util.List;
 
 @RestController
@@ -16,6 +18,7 @@ public class BeerController {
     }
 
     @GetMapping
+    @PreAuthorize("ROLE_USER")
     public List<Beer> getAllBeers() {
         return beerService.getBeers();
     }

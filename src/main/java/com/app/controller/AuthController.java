@@ -46,8 +46,9 @@ public class AuthController {
                         loginPayload.getPassword())
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = tokenProvider.generateToken(authentication);
-        return ResponseEntity.ok().header("Authorization", "Bearer " + jwt).body(JwtAuthenticationPayload.builder().accessToken(jwt).tokenType("Bearer").user(userRepository.findByEmail(loginPayload.getEmail()).get()).build());
+//        String jwt = tokenProvider.generateToken(authentication);
+//                header("Authorization", "Bearer " + jwt).body(JwtAuthenticationPayload.builder().accessToken(jwt).tokenType("Bearer").user(userRepository.findByEmail(loginPayload.getEmail()).get()).build());
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/signup")
