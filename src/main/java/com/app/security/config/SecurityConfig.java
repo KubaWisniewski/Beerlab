@@ -29,13 +29,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private JwtAuthenticationEntryPoint unauthorizedHandler;
 
-      @Override
+    @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userService).passwordEncoder(passwordEncoder());
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http.headers().frameOptions().disable();
         http
                 .cors()
                 .and()
@@ -47,21 +48,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/", "/favicon.ico", "/**/*.png", "/**/*.gif", "/**/*.svg", "/**/*.jpg", "/**/*.html", "/**/*.css", "/**/*.js")
                 .permitAll()
-                .antMatchers("/api/auth/signin", "/api/auth/signup", "/swagger-resources/**", "/swagger-ui.html/**", "/v2/api-docs", "/api/beer", "/h2-console/**")
+                .antMatchers("/api/auth/signin", "/api/auth/signup", "/swagger-resources/**", "/swagger-ui.html/**", "/v2/api-docs", "/api/beer", "/h2-console/**", "/console/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
                 .logout().logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler()).invalidateHttpSession(true).deleteCookies("JSESSIONID")
                 .permitAll();
-      
-        http.addFilterBefore(jwtAuthenticationFilter(), ConcurrentSessionFilter.class);
-       http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
-        http.authorizeRequests().antMatchers("/").permitAll().and()
-                .authorizeRequests().antMatchers("/console/**").permitAll();
-        http.csrf().disable();
-        http.headers().frameOptions().disable();
+        http.addFilterBefore(jwtAuthenticationFilter(), ConcurrentSessionFilter.class);
     }
 
     @Bean

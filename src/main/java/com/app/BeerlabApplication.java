@@ -21,7 +21,8 @@ import java.util.TimeZone;
         BeerlabApplication.class,
         Jsr310JpaConverters.class
 })
-public class BeerlabApplication implements CommandLineRunner {
+
+public class BeerlabApplication {
     private RoleRepository roleRepository;
     private BeerRepository beerRepository;
 
@@ -38,7 +39,7 @@ public class BeerlabApplication implements CommandLineRunner {
     void init() {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
     }
-
+/*
     @Override
     public void run(String... args) throws Exception {
         if (roleRepository.count() != RoleName.values().length) {
@@ -53,4 +54,6 @@ public class BeerlabApplication implements CommandLineRunner {
             beerRepository.saveAll(Arrays.asList(beer,beer2));
         }
     }
+
+ */
 }
