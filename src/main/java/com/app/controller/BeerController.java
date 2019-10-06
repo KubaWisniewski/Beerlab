@@ -18,7 +18,7 @@ public class BeerController {
     }
 
     @GetMapping
-    @PreAuthorize("ROLE_USER")
+    @PreAuthorize("hasRole('USER')")
     public List<Beer> getAllBeers() {
         return beerService.getBeers();
     }
