@@ -3,9 +3,13 @@ package com.app.controller;
 import com.app.payloads.requests.LoginPayload;
 import com.app.payloads.requests.RegisterPayload;
 import com.app.payloads.responses.ApiPayload;
+import com.app.security.CurrentUser;
+import com.app.security.CustomUserDetails;
 import com.app.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 
@@ -21,8 +25,8 @@ public class AuthController {
 
     @PostMapping("/signin")
     public ResponseEntity signIn(@Valid @RequestBody LoginPayload loginPayload) {
-        userService.authenticateUser(loginPayload.getEmail(),loginPayload.getPassword());
-        return ResponseEntity.ok().body(new ApiPayload(true, "User logged in successfully"));
+        CustomUserDetails customUserDetails = (CustomUserDetails) userService.authenticateUser(loginPayload.getEmail(), loginPayload.getPassword()).getPrincipal();
+        return ResponseEntity.ok().body(userService.getUserInformation(customUserDetails.getId()));
     }
 
     @PostMapping("/signup")

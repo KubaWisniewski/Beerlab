@@ -9,6 +9,7 @@ import com.app.model.modelMappers.ModelMapper;
 import com.app.payloads.requests.RegisterPayload;
 import com.app.repository.RoleRepository;
 import com.app.repository.UserRepository;
+import com.app.security.CustomUserDetails;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -47,9 +48,10 @@ public class UserService {
         return userRepository.existsUserByEmail(email).orElseThrow(UserRegisterException::new);
     }
 
-    public void authenticateUser(String email, String password) {
+    public Authentication authenticateUser(String email, String password) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        return authentication;
     }
 
     public void signUp(RegisterPayload registerPayload) {
