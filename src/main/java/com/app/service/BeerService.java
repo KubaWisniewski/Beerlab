@@ -1,88 +1,53 @@
 package com.app.service;
 
-import com.app.exception.CustomException;
-import com.app.exception.ExceptionCode;
-import com.app.exception.ExceptionInfo;
+import com.app.exception.ResourceNotFoundException;
 import com.app.model.Beer;
+import com.app.model.dto.BeerDto;
+import com.app.model.modelMappers.ModelMapper;
 import com.app.repository.BeerRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BeerService {
     private BeerRepository beerRepository;
+    private ModelMapper modelMapper;
 
-    public BeerService(BeerRepository beerRepository) {
+    public BeerService(BeerRepository beerRepository, ModelMapper modelMapper) {
         this.beerRepository = beerRepository;
+        this.modelMapper = modelMapper;
     }
 
-    public List<Beer> getBeers() {
-        try {
-            return beerRepository.findAll();
-        } catch (Exception e) {
-            throw new CustomException(ExceptionInfo.builder()
-                    .exceptionCode(ExceptionCode.SERVICE)
-                    .exceptionDescription("GET BEERS, " + e.getMessage())
-                    .exceptionDateTime(LocalDateTime.now())
-                    .build());
-        }
+    public List<BeerDto> getBeers() {
+        return beerRepository
+                .findAll()
+                .stream()
+                .map(modelMapper::fromBeerToBeerDto)
+                .collect(Collectors.toList());
     }
 
-    public Beer getBeer(Long id) {
-        try {
-            return beerRepository
-                    .findById(id)
-                    .orElseThrow(NullPointerException::new);
-        } catch (Exception e) {
-            throw new CustomException(ExceptionInfo.builder()
-                    .exceptionCode(ExceptionCode.SERVICE)
-                    .exceptionDescription("GET BEER, " + e.getMessage())
-                    .exceptionDateTime(LocalDateTime.now())
-                    .build());
-        }
+    public BeerDto getBeer(Long id) {
+        return beerRepository
+                .findById(id)
+                .map(modelMapper::fromBeerToBeerDto)
+                .orElseThrow(NullPointerException::new);
+
     }
 
-    public Beer addBeer(Beer beer) {
-        try {
-            if (beer == null)
-                throw new NullPointerException("Beer is null");
-            return beerRepository.save(beer);
-        } catch (Exception e) {
-            throw new CustomException(ExceptionInfo.builder()
-                    .exceptionCode(ExceptionCode.SERVICE)
-                    .exceptionDescription("ADD BEER, " + e.getMessage())
-                    .exceptionDateTime(LocalDateTime.now())
-                    .build());
-        }
+    public BeerDto addOrUpdateBeer(BeerDto beerDto) {
+        if (beerDto == null)
+            throw new NullPointerException("Beer is null");
+        Beer beer = modelMapper.fromBeerDtoToBeer(beerDto);
+        Beer beerFromDb = beerRepository.save(beer);
+        return modelMapper.fromBeerToBeerDto(beerFromDb);
     }
 
-    public Beer updateBeer(Beer beer) {
-        try {
-            if (beer == null)
-                throw new NullPointerException("Beer is null");
-            return beerRepository.save(beer);
-        } catch (Exception e) {
-            throw new CustomException(ExceptionInfo.builder()
-                    .exceptionCode(ExceptionCode.SERVICE)
-                    .exceptionDescription("UPDATE BEER, " + e.getMessage())
-                    .exceptionDateTime(LocalDateTime.now())
-                    .build());
-        }
-    }
+    public BeerDto deleteBeer(Long id) {
+        Beer beer = beerRepository.findById(id).orElseThrow(NullPointerException::new);
+        beerRepository.delete(beer);
+        return modelMapper.fromBeerToBeerDto(beer);
 
-    public Beer deleteBeer(Long id) {
-        try {
-            Beer beer = beerRepository.findById(id).orElseThrow(NullPointerException::new);
-            beerRepository.delete(beer);
-            return beer;
-        } catch (Exception e) {
-            throw new CustomException(ExceptionInfo.builder()
-                    .exceptionCode(ExceptionCode.SERVICE)
-                    .exceptionDescription("DELETE BEER, " + e.getMessage())
-                    .exceptionDateTime(LocalDateTime.now())
-                    .build());
-        }
     }
 }

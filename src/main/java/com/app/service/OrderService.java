@@ -1,5 +1,6 @@
 package com.app.service;
 
+import com.app.exception.ResourceNotFoundException;
 import com.app.model.Beer;
 import com.app.model.Order;
 import com.app.model.OrderItem;
@@ -8,8 +9,6 @@ import com.app.repository.BeerRepository;
 import com.app.repository.OrderRepository;
 import com.app.repository.UserRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class OrderService {
@@ -24,7 +23,7 @@ public class OrderService {
     }
 
     public Order getActualOrder(Long userId) {
-        Order order = orderRepository.findByUserIdAndStatus(userId,OrderStatus.INPROGRESS);
+        Order order = orderRepository.findByUserIdAndStatus(userId,OrderStatus.INPROGRESS).get();
         if (order != null) {
             return order;
         } else
@@ -37,10 +36,12 @@ public class OrderService {
         if (order == null) {
             order = createOrder(userId);
         }
-        Optional<Beer> beerTmp = beerRepository.findById(beer.getId());
-        OrderItem orderItem = OrderItem.builder().order(order).beer(beerTmp.get()).build();
+        Beer beerTmp = beerRepository.findById(beer.getId()).orElseThrow(ResourceNotFoundException::new);
+        OrderItem orderItem = OrderItem.builder().order(order).beer(beerTmp).build();
         order.getOrderItems().add(orderItem);
+        beerTmp.getOrderItems().add(orderItem);
         orderRepository.save(order);
+        beerRepository.save(beerTmp);
         return order;
     }
 

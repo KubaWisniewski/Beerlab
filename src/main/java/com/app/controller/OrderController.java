@@ -7,8 +7,6 @@ import com.app.security.CustomUserDetails;
 import com.app.service.OrderService;
 import org.springframework.web.bind.annotation.*;
 
-
-
 @RestController
 @RequestMapping("/api/order")
 public class OrderController {
@@ -24,7 +22,6 @@ public class OrderController {
     }
     @PostMapping
     public Order addBeerToOrder(@CurrentUser CustomUserDetails customUserDetails, @RequestBody Beer beer){
-        System.out.println(beer);
         return orderService.addBeerToOrder(customUserDetails.getId(),beer);
     }
 }
