@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -18,7 +19,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User implements Serializable {
     @Id
     @GeneratedValue
     private Long id;
@@ -41,20 +42,19 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
-    @Column(name="balance")
-    private Double balance;
-    @JsonBackReference
+    @Column(name = "balance")
+    private Double balance = 0.0;
     @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "user")
     private Set<Order> orders = new HashSet<>();
 
     public User(User user) {
-        id=user.getId();
-        username=user.getUsername();
-        email=user.getEmail();
-        password=user.getPassword();
-        roles=user.getRoles();
-        balance=user.getBalance();
-        orders=user.getOrders();
+        id = user.getId();
+        username = user.getUsername();
+        email = user.getEmail();
+        password = user.getPassword();
+        roles = user.getRoles();
+        balance = user.getBalance();
+        orders = user.getOrders();
     }
 
     @Override
