@@ -22,7 +22,7 @@ import java.util.TimeZone;
         BeerlabApplication.class,
         Jsr310JpaConverters.class
 })
-@EnableJdbcHttpSession(maxInactiveIntervalInSeconds = 60)
+@EnableJdbcHttpSession
 public class BeerlabApplication {
     private RoleRepository roleRepository;
     private BeerRepository beerRepository;
