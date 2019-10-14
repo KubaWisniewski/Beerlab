@@ -1,6 +1,7 @@
 package com.app;
 
 import com.app.model.Beer;
+import com.app.model.modelMappers.ModelMapper;
 import com.app.repository.BeerRepository;
 import com.app.service.BeerService;
 import org.junit.Test;
@@ -15,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -39,9 +41,9 @@ public class BeerRestControllerIntegrationTest {
     public void getBeersTest() throws Exception {
         Beer beer = Beer.builder().brand("Tyskie").description("Dobre piwo").id(1L).imgUrl("img1.png").price(15.5).quantity(5).build();
         Beer beer2 = Beer.builder().brand("Lech").description("Zwykle piwo").id(2L).imgUrl("img2.png").price(10.0).quantity(10).build();
-
+        ModelMapper modelMapper = new ModelMapper();
         List<Beer> beers = Arrays.asList(beer, beer2);
-        given(beerService.getBeers()).willReturn(beers);
+        given(beerService.getBeers()).willReturn(beers.stream().map(modelMapper::fromBeerToBeerDto).collect(Collectors.toList()));
 
         mvc.perform(get("/api/beer")
                 .contentType(MediaType.APPLICATION_JSON))

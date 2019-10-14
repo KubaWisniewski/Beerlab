@@ -1,69 +1,37 @@
 package com.app.controller;
 
-import com.app.model.Role;
-import com.app.model.RoleName;
-import com.app.model.User;
 import com.app.payloads.requests.LoginPayload;
 import com.app.payloads.requests.RegisterPayload;
 import com.app.payloads.responses.ApiPayload;
-import com.app.payloads.responses.JwtAuthenticationPayload;
-import com.app.repository.RoleRepository;
-import com.app.repository.UserRepository;
-import com.app.security.JwtTokenProvider;
+import com.app.security.CurrentUser;
+import com.app.security.CustomUserDetails;
+import com.app.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
-import java.util.Collections;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-    private AuthenticationManager authenticationManager;
-    private UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
-    private JwtTokenProvider tokenProvider;
-    private RoleRepository roleRepository;
 
-    public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenProvider tokenProvider, RoleRepository roleRepository) {
-        this.authenticationManager = authenticationManager;
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.tokenProvider = tokenProvider;
-        this.roleRepository = roleRepository;
+    private UserService userService;
+
+    public AuthController(UserService userService) {
+        this.userService = userService;
     }
 
     @PostMapping("/signin")
-    public ResponseEntity authenticateUser(@Valid @RequestBody LoginPayload loginPayload) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginPayload.getEmail(),
-                        loginPayload.getPassword())
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = tokenProvider.generateToken(authentication);
-        return ResponseEntity.ok().header("Authorization", "Bearer " + jwt).body(JwtAuthenticationPayload.builder().accessToken(jwt).tokenType("Bearer").user(userRepository.findByEmail(loginPayload.getEmail()).get()).build());
+    public ResponseEntity signIn(@Valid @RequestBody LoginPayload loginPayload) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) userService.authenticateUser(loginPayload.getEmail(), loginPayload.getPassword()).getPrincipal();
+        return ResponseEntity.ok().body(userService.getUserInformation(customUserDetails.getId()));
     }
 
     @PostMapping("/signup")
     public ResponseEntity registerUser(@Valid @RequestBody RegisterPayload registerPayload) {
-        if (userRepository.findByEmail(registerPayload.getEmail()).isPresent()) {
-            return ResponseEntity.badRequest().body(new ApiPayload(false, "Email Address already in use!"));
-        }
-
-        User user = User.builder().username(registerPayload.getUsername()).email(
-                registerPayload.getEmail()).password(registerPayload.getPassword()).build();
-
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        Role userRole = roleRepository.findByRoleName(RoleName.ROLE_USER);
-        user.setRoles(Collections.singleton(userRole));
-        userRepository.save(user);
-
+        userService.signUp(registerPayload);
         return ResponseEntity.ok().body(new ApiPayload(true, "User registered successfully"));
     }
 }
