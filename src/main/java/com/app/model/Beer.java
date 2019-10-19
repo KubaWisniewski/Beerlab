@@ -1,6 +1,5 @@
 package com.app.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,7 +24,7 @@ public class Beer {
     private String brand;
     private Double price;
     private Integer quantity;
-    @JsonIgnore
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST)
     private Set<OrderItem> orderItems = new HashSet<>();
 

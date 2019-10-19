@@ -1,8 +1,5 @@
 package com.app.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,13 +20,14 @@ public class Order {
     @Id
     @GeneratedValue
     private Long id;
+
     @ManyToOne(cascade = CascadeType.PERSIST)
-    @JsonIgnore
     @JoinColumn(name = "user_id")
     private User user;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST)
     private Set<OrderItem> orderItems = new HashSet<>();
+
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
