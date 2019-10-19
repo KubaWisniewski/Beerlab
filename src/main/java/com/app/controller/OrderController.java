@@ -1,7 +1,7 @@
 package com.app.controller;
 
-import com.app.model.Beer;
-import com.app.model.Order;
+import com.app.model.dto.BeerDto;
+import com.app.model.dto.OrderDto;
 import com.app.security.CurrentUser;
 import com.app.security.CustomUserDetails;
 import com.app.service.OrderService;
@@ -16,12 +16,8 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @GetMapping
-    public Order getOrderInprogress(@CurrentUser CustomUserDetails customUserDetails) {
-        return orderService.getActualOrder(customUserDetails.getId());
-    }
     @PostMapping
-    public Order addBeerToOrder(@CurrentUser CustomUserDetails customUserDetails, @RequestBody Beer beer){
-        return orderService.addBeerToOrder(customUserDetails.getId(),beer);
+    public OrderDto addBeerToOrder(@CurrentUser CustomUserDetails customUserDetails, @RequestBody BeerDto beerDto) {
+        return orderService.createOrder(customUserDetails.getId(), beerDto);
     }
 }

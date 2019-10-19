@@ -1,11 +1,7 @@
 package com.app.model.modelMappers;
 
-import com.app.model.Beer;
-import com.app.model.Role;
-import com.app.model.User;
-import com.app.model.dto.BeerDto;
-import com.app.model.dto.RoleDto;
-import com.app.model.dto.UserDto;
+import com.app.model.*;
+import com.app.model.dto.*;
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
@@ -34,6 +30,7 @@ public class ModelMapper {
                 .build();
     }
 
+
     public RoleDto fromRoleToRoleDto(Role role) {
         return role ==
                 null ? null : RoleDto.builder()
@@ -50,6 +47,33 @@ public class ModelMapper {
                 .build();
     }
 
+    public OrderItemDto fromOrderItemToOrderItemDto(OrderItem orderItem) {
+        return orderItem == null ? null : OrderItemDto.builder().beerDto(orderItem.getBeer() == null ? null : fromBeerToBeerDto(orderItem.getBeer())).build();
+    }
+
+    public OrderItem fromOrderItemDtoToOrderItem(OrderItemDto orderItemDto) {
+        return orderItemDto == null ? null : OrderItem.builder().beer(orderItemDto.getBeerDto() == null ? null : fromBeerDtoToBeer(orderItemDto.getBeerDto())).build();
+    }
+
+    public OrderDto fromOrderToOrderDto(Order order) {
+        return order ==
+                null ? null : OrderDto.builder()
+                .id(order.getId())
+                .status(order.getStatus())
+                .orderItemsDto(order.getOrderItems() == null ? null : order.getOrderItems().stream().map(this::fromOrderItemToOrderItemDto).collect(Collectors.toSet()))
+                .build();
+    }
+
+    public Order fromOrderDtoToOrder(OrderDto orderDto) {
+        return orderDto
+                ==
+                null ? null : Order.builder()
+                .id(orderDto.getId())
+                .status(orderDto.getStatus())
+                .orderItems(orderDto.getOrderItemsDto() == null ? null : orderDto.getOrderItemsDto().stream().map(this::fromOrderItemDtoToOrderItem).collect(Collectors.toSet()))
+                .build();
+    }
+
     public BeerDto fromBeerToBeerDto(Beer beer) {
         return beer ==
                 null ? null : BeerDto.builder()
@@ -61,6 +85,7 @@ public class ModelMapper {
                 .quantity(beer.getQuantity())
                 .build();
     }
+
     public Beer fromBeerDtoToBeer(BeerDto beerDto) {
         return beerDto ==
                 null ? null : Beer.builder()

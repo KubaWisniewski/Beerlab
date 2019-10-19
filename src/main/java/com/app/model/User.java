@@ -1,7 +1,5 @@
 package com.app.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -44,6 +42,7 @@ public class User implements Serializable {
 
     @Column(name = "balance")
     private Double balance = 0.0;
+
     @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "user")
     private Set<Order> orders = new HashSet<>();
 
