@@ -1,6 +1,5 @@
 package com.app;
 
-
 import com.app.model.Beer;
 import com.app.model.Role;
 import com.app.model.RoleName;
@@ -31,6 +30,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -60,7 +60,7 @@ public class UserRestControllerIntegrationTest {
                     .forEach(role -> roleRepository.save(Role.builder().roleName(role).build()));
         }
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        userRepository.save(User.builder().email("test@test.com").username("test").roles(Sets.newSet(roleRepository.findByRoleName(RoleName.ROLE_USER).get())).password(bCryptPasswordEncoder.encode("123")).build());
+        userRepository.save(User.builder().email("test@test.com").username("test").roles(Sets.newSet(roleRepository.findByRoleName(RoleName.ROLE_USER).get())).password(bCryptPasswordEncoder.encode("123")).balance(100.0).build());
         beerRepository.save(Beer.builder().brand("Aaa").description("Adesc").quantity(10).price(10.0).build());
     }
 
@@ -80,9 +80,25 @@ public class UserRestControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON).header("Accept", "application/json").content(gsonBuilder.toJson(RegisterPayload.builder().email("newTest@test.com").username("newTest").password("123").build())))
                 .andExpect(status().isOk()).andExpect(content().json(gsonBuilder.toJson(ApiPayload.builder().success(true).message("User registered successfully").build())));
         Assert.assertEquals(2, userRepository.findAll().size());
-
     }
 
+    @Test
+    public void getUserInformation() throws Exception {
+        Gson gsonBuilder = new GsonBuilder().create();
+        UserDto userDto = userRepository.findById(1L).map(modelMapper::fromUserToUserDto).orElseThrow(NullPointerException::new);
+        mvc.perform(get("/api/user/me")
+                .contentType(MediaType.APPLICATION_JSON).header("X-Auth-Token", getAuthToken()).header("Accept", "application/json"))
+                .andExpect(status().isOk()).andExpect(content().json(gsonBuilder.toJson(userDto)));
+    }
+
+    @Test
+    public void getUserBalance() throws Exception {
+        Gson gsonBuilder = new GsonBuilder().create();
+        UserDto userDto = userRepository.findById(1L).map(modelMapper::fromUserToUserDto).orElseThrow(NullPointerException::new);
+        mvc.perform(get("/api/user/balance")
+                .contentType(MediaType.APPLICATION_JSON).header("X-Auth-Token", getAuthToken()).header("Accept", "application/json"))
+                .andExpect(status().isOk()).andExpect(content().json(gsonBuilder.toJson(userDto.getBalance())));
+    }
 
     private String getAuthToken() throws Exception {
         Gson gsonBuilder = new GsonBuilder().create();
