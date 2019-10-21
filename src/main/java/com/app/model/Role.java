@@ -17,7 +17,7 @@ import static javax.persistence.EnumType.STRING;
 @AllArgsConstructor
 public class Role implements Serializable {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "role_name")
