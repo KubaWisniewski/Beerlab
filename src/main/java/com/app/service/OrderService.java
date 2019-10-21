@@ -35,7 +35,6 @@ public class OrderService {
         OrderItem orderItem = OrderItem.builder().order(order).beer(beerTmp).build();
         order.getOrderItems().add(orderItem);
         beerTmp.getOrderItems().add(orderItem);
-        user.setBalance(user.getBalance() - beerTmp.getPrice());
         beerRepository.save(beerTmp);
         orderRepository.save(order);
         return modelMapper.fromOrderToOrderDto(order);
