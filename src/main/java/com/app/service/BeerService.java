@@ -1,6 +1,5 @@
 package com.app.service;
 
-import com.app.exception.ResourceNotFoundException;
 import com.app.model.Beer;
 import com.app.model.dto.BeerDto;
 import com.app.model.modelMappers.ModelMapper;
