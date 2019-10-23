@@ -1,6 +1,5 @@
 package com.app.model.dto;
 
-import com.app.model.Group;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,14 +9,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class UserDto {
+public class GroupDto {
     private Long id;
-    private String username;
-    private String email;
-    private Set<RoleDto> rolesDto = new HashSet<>();
-    private Double balance;
-    private Group group;
+    private String name;
+    private String description;
+    private UserDto groupOwner;
+    private Set<UserDto> members = new HashSet<>();
 }
