@@ -38,6 +38,7 @@ public class OrderService {
         user.setBalance(user.getBalance() - beerTmp.getPrice());
         beerRepository.save(beerTmp);
         orderRepository.save(order);
+        userRepository.save(user);
         return modelMapper.fromOrderToOrderDto(order);
     }
 

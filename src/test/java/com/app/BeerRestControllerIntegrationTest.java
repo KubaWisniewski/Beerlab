@@ -89,6 +89,8 @@ public class BeerRestControllerIntegrationTest {
         BeerDto beerDto = BeerDto.builder().brand("Test").description("TestDesc").price(10.0).quantity(10).imgUrl("TestImg.png").build();
         mvc.perform(post("/api/beer").contentType(MediaType.APPLICATION_JSON).header("X-Auth-Token", getAuthToken()).header("Accept", "application/json").content(gsonBuilder.toJson(beerDto).toString()))
                 .andExpect(content().json(gsonBuilder.toJson(beerDto)));
+        Assert.assertEquals(2, beerRepository.findAll().size());
+
     }
 
     @Test
