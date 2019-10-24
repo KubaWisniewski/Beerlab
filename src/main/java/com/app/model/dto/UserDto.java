@@ -1,6 +1,5 @@
 package com.app.model.dto;
 
-import com.app.model.Group;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
