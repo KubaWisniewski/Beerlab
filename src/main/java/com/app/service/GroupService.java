@@ -43,7 +43,7 @@ public class GroupService {
         return modelMapper.fromGroupToGroupDto(group);
     }
 
-    public GroupDto deleteBeer(Long id) {
+    public GroupDto deleteGroup(Long id) {
         Group group = groupRepository.findById(id).orElseThrow(NullPointerException::new);
         groupRepository.delete(group);
         return modelMapper.fromGroupToGroupDto(group);

@@ -19,5 +19,4 @@ public class UserDto {
     private String email;
     private Set<RoleDto> rolesDto = new HashSet<>();
     private Double balance;
-    private Group group;
 }

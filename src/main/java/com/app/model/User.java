@@ -46,10 +46,11 @@ public class User implements Serializable {
     @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "user")
     private Set<Order> orders = new HashSet<>();
 
-    @OneToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "group_id", unique = true)
-    private Group group;
-
+    /*
+        @ManyToOne(cascade = CascadeType.PERSIST)
+        @JoinColumn(name = "group_id")
+        private Group group;
+    */
     public User(User user) {
         id = user.getId();
         username = user.getUsername();

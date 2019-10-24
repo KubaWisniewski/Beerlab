@@ -32,7 +32,7 @@ public class GroupController {
 
     @DeleteMapping("/{id}")
     public GroupDto deleteGroup(@PathVariable Long id) {
-        return groupService.deleteBeer(id);
+        return groupService.deleteGroup(id);
     }
 
     @PutMapping

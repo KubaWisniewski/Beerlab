@@ -45,22 +45,22 @@ public class BeerlabApplication {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
     }
 
-//    public void run(String... args) throws Exception {
-//        if (roleRepository.count() != RoleName.values().length) {
-//            roleRepository.deleteAll();
-//            Arrays
-//                    .stream(RoleName.values())
-//                    .forEach(role -> roleRepository.save(Role.builder().roleName(role).build()));
-//        }
-//        if (beerRepository.count() == 0) {
-//            Beer beer = Beer.builder().brand("Aaaa").description("ADesc").price(10.0).build();
-//            Beer beer2 = Beer.builder().brand("Bbbb").description("BDesc").price(10.0).build();
-//            beerRepository.saveAll(Arrays.asList(beer, beer2));
-//        }
-//
-//        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-//        userRepository.save(User.builder().email("test@test.com").username("test").roles(Collections.singleton(roleRepository.findByRoleName(RoleName.ROLE_USER).get())).password(bCryptPasswordEncoder.encode("123")).build());
-//        userRepository.save(User.builder().email("admin@test.com").username("admin").roles(Collections.singleton(roleRepository.findByRoleName(RoleName.ROLE_ADMIN).get())).password(bCryptPasswordEncoder.encode("123")).build());
-//
-//    }
+    public void run(String... args) throws Exception {
+        if (roleRepository.count() != RoleName.values().length) {
+            roleRepository.deleteAll();
+            Arrays
+                    .stream(RoleName.values())
+                    .forEach(role -> roleRepository.save(Role.builder().roleName(role).build()));
+        }
+        if (beerRepository.count() == 0) {
+            Beer beer = Beer.builder().brand("Aaaa").description("ADesc").price(10.0).build();
+            Beer beer2 = Beer.builder().brand("Bbbb").description("BDesc").price(10.0).build();
+            beerRepository.saveAll(Arrays.asList(beer, beer2));
+        }
+
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        userRepository.save(User.builder().email("test@test.com").username("test").roles(Collections.singleton(roleRepository.findByRoleName(RoleName.ROLE_USER).get())).password(bCryptPasswordEncoder.encode("123")).build());
+        userRepository.save(User.builder().email("admin@test.com").username("admin").roles(Collections.singleton(roleRepository.findByRoleName(RoleName.ROLE_ADMIN).get())).password(bCryptPasswordEncoder.encode("123")).build());
+
+    }
 }

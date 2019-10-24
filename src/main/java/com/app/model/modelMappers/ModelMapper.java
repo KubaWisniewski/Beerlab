@@ -16,7 +16,6 @@ public class ModelMapper {
                 .balance(user.getBalance())
                 .username(user.getUsername())
                 .rolesDto(user.getRoles() == null ? null : user.getRoles().stream().map(this::fromRoleToRoleDto).collect(Collectors.toSet()))
-                .group(user.getGroup())
                 .build();
     }
 
@@ -28,7 +27,6 @@ public class ModelMapper {
                 .balance(userDto.getBalance())
                 .username(userDto.getUsername())
                 .roles(userDto.getRolesDto() == null ? null : userDto.getRolesDto().stream().map(this::fromRoleDtoToRole).collect(Collectors.toSet()))
-                .group(userDto.getGroup())
                 .build();
     }
 
@@ -104,8 +102,7 @@ public class ModelMapper {
         return group == null ? null : GroupDto.builder()
                 .id(group.getId())
                 .name(group.getName())
-                .groupOwner(fromUserToUserDto(group.getGroupOwner()))
-                .members(group.getMembers() == null ? null : group.getMembers().stream().map(this::fromUserToUserDto).collect(Collectors.toSet()))
+                //.members(group.getMembers() == null ? null : group.getMembers().stream().map(this::fromUserToUserDto).collect(Collectors.toSet()))
                 .description(group.getDescription())
                 .build();
     }
@@ -114,9 +111,8 @@ public class ModelMapper {
         return groupDto == null ? null : Group.builder()
                 .id(groupDto.getId())
                 .name(groupDto.getName())
-                .groupOwner(fromUserDtoToUser(groupDto.getGroupOwner()))
                 .description(groupDto.getDescription())
-                .members(groupDto.getMembers() == null ? null : groupDto.getMembers().stream().map(this::fromUserDtoToUser).collect(Collectors.toSet()))
+                //.members(groupDto.getMembers() == null ? null : groupDto.getMembers().stream().map(this::fromUserDtoToUser).collect(Collectors.toSet()))
                 .build();
     }
 }
