@@ -97,4 +97,22 @@ public class ModelMapper {
                 .quantity(beerDto.getQuantity())
                 .build();
     }
+
+    public GroupDto fromGroupToGroupDto(Group group) {
+        return group == null ? null : GroupDto.builder()
+                .id(group.getId())
+                .name(group.getName())
+                .members(group.getMembers() == null ? null : group.getMembers().stream().map(this::fromUserToUserDto).collect(Collectors.toSet()))
+                .description(group.getDescription())
+                .build();
+    }
+
+    public Group fromGroupDtoToGroup(GroupDto groupDto) {
+        return groupDto == null ? null : Group.builder()
+                .id(groupDto.getId())
+                .name(groupDto.getName())
+                .description(groupDto.getDescription())
+                .members(groupDto.getMembers() == null ? null : groupDto.getMembers().stream().map(this::fromUserDtoToUser).collect(Collectors.toSet()))
+                .build();
+    }
 }
