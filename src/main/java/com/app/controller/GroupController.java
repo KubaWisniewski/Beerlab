@@ -1,10 +1,13 @@
 package com.app.controller;
 
 import com.app.model.dto.GroupDto;
+import com.app.model.dto.UserDto;
+import com.app.payloads.requests.AddUserGroupPayload;
 import com.app.service.GroupService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/group")
@@ -38,6 +41,16 @@ public class GroupController {
     @PutMapping
     public GroupDto updateGroup(@RequestBody GroupDto groupDto) {
         return groupService.addOrUpdateGroup(groupDto);
+    }
+
+    @PutMapping("/addUser")
+    public GroupDto addUserToGroup(@RequestBody AddUserGroupPayload addUserGroupPayload) {
+        return groupService.addUserToGroup(addUserGroupPayload.getEmail(), addUserGroupPayload.getGroupName());
+    }
+
+    @DeleteMapping("/deleteUser/{id}")
+    public GroupDto deleteUserFromGroup(@PathVariable Long id, @RequestBody GroupDto groupDto) {
+        return groupService.deleteUserFromGroup(id, groupDto);
     }
 
 }

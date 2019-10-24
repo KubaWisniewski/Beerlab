@@ -16,5 +16,5 @@ public class GroupDto {
     private Long id;
     private String name;
     private String description;
-    // private Set<UserDto> members = new HashSet<>();
+    private Set<UserDto> members = new HashSet<>();
 }

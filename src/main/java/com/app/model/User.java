@@ -46,11 +46,10 @@ public class User implements Serializable {
     @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "user")
     private Set<Order> orders = new HashSet<>();
 
-    /*
         @ManyToOne(cascade = CascadeType.PERSIST)
         @JoinColumn(name = "group_id")
         private Group group;
-    */
+
     public User(User user) {
         id = user.getId();
         username = user.getUsername();
@@ -72,5 +71,15 @@ public class User implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                '}';
     }
 }

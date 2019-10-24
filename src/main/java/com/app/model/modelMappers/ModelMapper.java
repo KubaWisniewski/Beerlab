@@ -102,7 +102,7 @@ public class ModelMapper {
         return group == null ? null : GroupDto.builder()
                 .id(group.getId())
                 .name(group.getName())
-                //.members(group.getMembers() == null ? null : group.getMembers().stream().map(this::fromUserToUserDto).collect(Collectors.toSet()))
+                .members(group.getMembers() == null ? null : group.getMembers().stream().map(this::fromUserToUserDto).collect(Collectors.toSet()))
                 .description(group.getDescription())
                 .build();
     }
@@ -112,7 +112,7 @@ public class ModelMapper {
                 .id(groupDto.getId())
                 .name(groupDto.getName())
                 .description(groupDto.getDescription())
-                //.members(groupDto.getMembers() == null ? null : groupDto.getMembers().stream().map(this::fromUserDtoToUser).collect(Collectors.toSet()))
+                .members(groupDto.getMembers() == null ? null : groupDto.getMembers().stream().map(this::fromUserDtoToUser).collect(Collectors.toSet()))
                 .build();
     }
 }

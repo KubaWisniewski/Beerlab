@@ -15,6 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 @Entity
+@Table(name = "`Group`")
 public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,10 +24,9 @@ public class Group {
     private String name;
     private String description;
 
-    /*
     @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "group")
     private Set<User> members = new HashSet<>();
-*/
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
