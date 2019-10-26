@@ -43,12 +43,12 @@ public class User implements Serializable {
     @Column(name = "balance")
     private Double balance = 0.0;
 
-    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Order> orders = new HashSet<>();
 
-        @ManyToOne(cascade = CascadeType.PERSIST)
-        @JoinColumn(name = "group_id")
-        private Group group;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_id")
+    private Group group;
 
     public User(User user) {
         id = user.getId();

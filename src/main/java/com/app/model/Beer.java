@@ -25,9 +25,8 @@ public class Beer {
     private Double price;
     private Integer quantity;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "order", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<OrderItem> orderItems = new HashSet<>();
-
 
     @Override
     public boolean equals(Object o) {

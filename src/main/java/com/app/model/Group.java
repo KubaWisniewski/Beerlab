@@ -20,11 +20,10 @@ public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
     private String description;
 
-    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "group")
+    @OneToMany(mappedBy = "group", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<User> members = new HashSet<>();
 
     @Override
