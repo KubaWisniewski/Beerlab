@@ -54,11 +54,11 @@ public class GroupService {
         return modelMapper.fromGroupToGroupDto(group);
     }
 
-    public GroupDto addUserToGroup(String email, String groupDto) {
-        if (email == null && groupDto == null) {
+    public GroupDto addUserToGroup(String email, String groupName) {
+        if (email == null && groupName == null) {
             throw new NullPointerException("User email and group null");
         }
-        Group group = groupRepository.findByName(groupDto);
+        Group group = groupRepository.findByName(groupName);
         User userToAdd = userRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("User not exist"));
         group.getMembers().add(userToAdd);
         userToAdd.setGroup(group);
@@ -67,9 +67,12 @@ public class GroupService {
         return modelMapper.fromGroupToGroupDto(group);
     }
 
-    public GroupDto deleteUserFromGroup(Long id, GroupDto groupDto) {
-        Group group = modelMapper.fromGroupDtoToGroup(groupDto);
-        User user = userRepository.findById(id).orElseThrow(() -> new NullPointerException("user not found"));
+    public GroupDto deleteUserFromGroup(String email, String groupName) {
+        if (email == null && groupName == null) {
+            throw new NullPointerException("User email and group null");
+        }
+        Group group = groupRepository.findByName(groupName);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("User not exist"));
         user.setGroup(null);
         group.getMembers().remove(user);
         groupRepository.save(group);

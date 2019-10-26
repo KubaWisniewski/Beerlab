@@ -4,9 +4,11 @@ import com.app.model.Beer;
 import com.app.model.Role;
 import com.app.model.RoleName;
 import com.app.model.User;
-import com.app.model.dto.BeerDto;
+import com.app.model.dto.UserDto;
 import com.app.model.modelMappers.ModelMapper;
 import com.app.payloads.requests.LoginPayload;
+import com.app.payloads.requests.RegisterPayload;
+import com.app.payloads.responses.ApiPayload;
 import com.app.repository.BeerRepository;
 import com.app.repository.RoleRepository;
 import com.app.repository.UserRepository;
@@ -27,15 +29,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-
-
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -43,13 +39,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(properties = "spring.profiles.active=test")
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class BeerRestControllerIntegrationTest {
+public class UserRestControllerIntegrationTest {
     @Autowired
     private MockMvc mvc;
     @Autowired
-    private BeerRepository beerRepository;
-    @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private BeerRepository beerRepository;
     @Autowired
     private RoleRepository roleRepository;
     @Autowired
@@ -64,79 +60,56 @@ public class BeerRestControllerIntegrationTest {
                     .forEach(role -> roleRepository.save(Role.builder().roleName(role).build()));
         }
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        userRepository.save(User.builder().email("test@test.com").username("test").roles(Sets.newSet(roleRepository.findByRoleName(RoleName.ROLE_USER).get())).password(bCryptPasswordEncoder.encode("123")).build());
+        userRepository.save(User.builder().email("test@test.com").username("test").roles(Sets.newSet(roleRepository.findByRoleName(RoleName.ROLE_USER).get())).password(bCryptPasswordEncoder.encode("123")).balance(100.0).build());
         beerRepository.save(Beer.builder().brand("Aaa").description("Adesc").quantity(10).price(10.0).build());
     }
 
     @Test
-    public void getBeersTest() throws Exception {
+    public void signInTest() throws Exception {
         Gson gsonBuilder = new GsonBuilder().create();
-        List<BeerDto> beersDto = beerRepository.findAll().stream().map(modelMapper::fromBeerToBeerDto).collect(Collectors.toList());
-        mvc.perform(get("/api/beer")
+        UserDto userDto = userRepository.findById(1L).map(modelMapper::fromUserToUserDto).orElseThrow(NullPointerException::new);
+        mvc.perform(post("/api/auth/signin")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("X-Auth-Token", getAuthToken())
-                .header("Accept", "application/json"))
-                .andExpect(status().isOk())
-                .andExpect(content().json(gsonBuilder.toJson(beersDto)));
-        Assert.assertEquals(1, userRepository.findAll().size());
-
-    }
-
-    @Test
-    public void getBeerTest() throws Exception {
-        Gson gsonBuilder = new GsonBuilder().create();
-        BeerDto beerDto = beerRepository.findById(1L).map(modelMapper::fromBeerToBeerDto).orElseThrow(NullPointerException::new);
-        mvc.perform(get("/api/beer/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("X-Auth-Token", getAuthToken())
-                .header("Accept", "application/json"))
-                .andExpect(status().isOk())
-                .andExpect(content().json(gsonBuilder.toJson(beerDto)));
-    }
-
-    @Test
-    public void addBeerTest() throws Exception {
-        Gson gsonBuilder = new GsonBuilder().create();
-        BeerDto beerDto = BeerDto.builder().brand("Test").description("TestDesc").price(10.0).quantity(10).imgUrl("TestImg.png").build();
-        mvc.perform(post("/api/beer")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("X-Auth-Token", getAuthToken())
                 .header("Accept", "application/json")
-                .content(gsonBuilder.toJson(beerDto)))
+                .content(gsonBuilder.toJson(LoginPayload.builder().email("test@test.com").password("123").build())))
                 .andExpect(status().isOk())
-                .andExpect(content().json(gsonBuilder.toJson(beerDto)));
-        Assert.assertEquals(2, beerRepository.findAll().size());
+                .andExpect(content().json(gsonBuilder.toJson(userDto)));
     }
 
     @Test
-    public void updateBeerTest() throws Exception {
+    public void signUpTest() throws Exception {
         Gson gsonBuilder = new GsonBuilder().create();
-        BeerDto beerDto = beerRepository.findById(1L).map(modelMapper::fromBeerToBeerDto).orElseThrow(NullPointerException::new);
-        final String updateDesc = "UpdateDesc";
-        beerDto.setDescription(updateDesc);
-        mvc.perform(put("/api/beer")
+        mvc.perform(post("/api/auth/signup")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("X-Auth-Token", getAuthToken())
                 .header("Accept", "application/json")
-                .content(gsonBuilder.toJson(beerDto)))
+                .content(gsonBuilder.toJson(RegisterPayload.builder().email("newTest@test.com").username("newTest").password("123").build())))
                 .andExpect(status().isOk())
-                .andExpect(content().json(gsonBuilder.toJson(beerDto)));
-        Assert.assertEquals(1, beerRepository.findAll().size());
-        Assert.assertEquals(updateDesc, beerRepository.findById(1L).get().getDescription());
+                .andExpect(content().json(gsonBuilder.toJson(ApiPayload.builder().success(true).message("User registered successfully").build())));
+        Assert.assertEquals(2, userRepository.findAll().size());
     }
 
     @Test
-    public void deleteBeerTest() throws Exception {
+    public void getUserInformationTest() throws Exception {
         Gson gsonBuilder = new GsonBuilder().create();
-        final int countBefore = beerRepository.findAll().size();
-        BeerDto beerDto = beerRepository.findById(1L).map(modelMapper::fromBeerToBeerDto).orElseThrow(NullPointerException::new);
-        mvc.perform(delete("/api/beer/1")
+        UserDto userDto = userRepository.findById(1L).map(modelMapper::fromUserToUserDto).orElseThrow(NullPointerException::new);
+        mvc.perform(get("/api/user/me")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-Auth-Token", getAuthToken())
                 .header("Accept", "application/json"))
                 .andExpect(status().isOk())
-                .andExpect(content().json(gsonBuilder.toJson(beerDto)));
-        Assert.assertEquals(countBefore - 1, beerRepository.findAll().size());
+                .andExpect(content().json(gsonBuilder.toJson(userDto)));
+    }
+
+    @Test
+    public void getUserBalanceTest() throws Exception {
+        Gson gsonBuilder = new GsonBuilder().create();
+        UserDto userDto = userRepository.findById(1L).map(modelMapper::fromUserToUserDto).orElseThrow(NullPointerException::new);
+        mvc.perform(get("/api/user/balance")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Auth-Token", getAuthToken())
+                .header("Accept", "application/json"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(gsonBuilder.toJson(userDto.getBalance())));
     }
 
     private String getAuthToken() throws Exception {
