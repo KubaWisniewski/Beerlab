@@ -64,7 +64,6 @@ public class GroupService {
         userToAdd.setGroup(group);
         userRepository.save(userToAdd);
         groupRepository.save(group);
-        System.out.println(group);
         return modelMapper.fromGroupToGroupDto(group);
     }
 
