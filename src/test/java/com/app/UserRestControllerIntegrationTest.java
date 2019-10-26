@@ -69,35 +69,47 @@ public class UserRestControllerIntegrationTest {
         Gson gsonBuilder = new GsonBuilder().create();
         UserDto userDto = userRepository.findById(1L).map(modelMapper::fromUserToUserDto).orElseThrow(NullPointerException::new);
         mvc.perform(post("/api/auth/signin")
-                .contentType(MediaType.APPLICATION_JSON).header("Accept", "application/json").content(gsonBuilder.toJson(LoginPayload.builder().email("test@test.com").password("123").build())))
-                .andExpect(status().isOk()).andExpect(content().json(gsonBuilder.toJson(userDto)));
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Accept", "application/json")
+                .content(gsonBuilder.toJson(LoginPayload.builder().email("test@test.com").password("123").build())))
+                .andExpect(status().isOk())
+                .andExpect(content().json(gsonBuilder.toJson(userDto)));
     }
 
     @Test
     public void signUpTest() throws Exception {
         Gson gsonBuilder = new GsonBuilder().create();
         mvc.perform(post("/api/auth/signup")
-                .contentType(MediaType.APPLICATION_JSON).header("Accept", "application/json").content(gsonBuilder.toJson(RegisterPayload.builder().email("newTest@test.com").username("newTest").password("123").build())))
-                .andExpect(status().isOk()).andExpect(content().json(gsonBuilder.toJson(ApiPayload.builder().success(true).message("User registered successfully").build())));
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Accept", "application/json")
+                .content(gsonBuilder.toJson(RegisterPayload.builder().email("newTest@test.com").username("newTest").password("123").build())))
+                .andExpect(status().isOk())
+                .andExpect(content().json(gsonBuilder.toJson(ApiPayload.builder().success(true).message("User registered successfully").build())));
         Assert.assertEquals(2, userRepository.findAll().size());
     }
 
     @Test
-    public void getUserInformation() throws Exception {
+    public void getUserInformationTest() throws Exception {
         Gson gsonBuilder = new GsonBuilder().create();
         UserDto userDto = userRepository.findById(1L).map(modelMapper::fromUserToUserDto).orElseThrow(NullPointerException::new);
         mvc.perform(get("/api/user/me")
-                .contentType(MediaType.APPLICATION_JSON).header("X-Auth-Token", getAuthToken()).header("Accept", "application/json"))
-                .andExpect(status().isOk()).andExpect(content().json(gsonBuilder.toJson(userDto)));
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Auth-Token", getAuthToken())
+                .header("Accept", "application/json"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(gsonBuilder.toJson(userDto)));
     }
 
     @Test
-    public void getUserBalance() throws Exception {
+    public void getUserBalanceTest() throws Exception {
         Gson gsonBuilder = new GsonBuilder().create();
         UserDto userDto = userRepository.findById(1L).map(modelMapper::fromUserToUserDto).orElseThrow(NullPointerException::new);
         mvc.perform(get("/api/user/balance")
-                .contentType(MediaType.APPLICATION_JSON).header("X-Auth-Token", getAuthToken()).header("Accept", "application/json"))
-                .andExpect(status().isOk()).andExpect(content().json(gsonBuilder.toJson(userDto.getBalance())));
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Auth-Token", getAuthToken())
+                .header("Accept", "application/json"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(gsonBuilder.toJson(userDto.getBalance())));
     }
 
     private String getAuthToken() throws Exception {

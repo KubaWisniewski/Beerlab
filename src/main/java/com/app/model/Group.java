@@ -23,7 +23,7 @@ public class Group {
     private String name;
     private String description;
 
-    @OneToMany(mappedBy = "group", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "group", fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
     private Set<User> members = new HashSet<>();
 
     @Override

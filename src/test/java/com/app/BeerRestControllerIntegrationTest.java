@@ -30,9 +30,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -68,37 +71,71 @@ public class BeerRestControllerIntegrationTest {
     @Test
     public void getBeersTest() throws Exception {
         Gson gsonBuilder = new GsonBuilder().create();
-        List<BeerDto> beers = beerRepository.findAll().stream().map(modelMapper::fromBeerToBeerDto).collect(Collectors.toList());
+        List<BeerDto> beersDto = beerRepository.findAll().stream().map(modelMapper::fromBeerToBeerDto).collect(Collectors.toList());
         mvc.perform(get("/api/beer")
-                .contentType(MediaType.APPLICATION_JSON).header("X-Auth-Token", getAuthToken()).header("Accept", "application/json"))
-                .andExpect(content().json(gsonBuilder.toJson(beers)));
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Auth-Token", getAuthToken())
+                .header("Accept", "application/json"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(gsonBuilder.toJson(beersDto)));
+        Assert.assertEquals(1, userRepository.findAll().size());
+
     }
 
     @Test
     public void getBeerTest() throws Exception {
         Gson gsonBuilder = new GsonBuilder().create();
-        BeerDto beer = beerRepository.findById(1L).map(modelMapper::fromBeerToBeerDto).orElseThrow(NullPointerException::new);
+        BeerDto beerDto = beerRepository.findById(1L).map(modelMapper::fromBeerToBeerDto).orElseThrow(NullPointerException::new);
         mvc.perform(get("/api/beer/1")
-                .contentType(MediaType.APPLICATION_JSON).header("X-Auth-Token", getAuthToken()).header("Accept", "application/json"))
-                .andExpect(content().json(gsonBuilder.toJson(beer)));
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Auth-Token", getAuthToken())
+                .header("Accept", "application/json"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(gsonBuilder.toJson(beerDto)));
     }
 
     @Test
     public void addBeerTest() throws Exception {
         Gson gsonBuilder = new GsonBuilder().create();
         BeerDto beerDto = BeerDto.builder().brand("Test").description("TestDesc").price(10.0).quantity(10).imgUrl("TestImg.png").build();
-        mvc.perform(post("/api/beer").contentType(MediaType.APPLICATION_JSON).header("X-Auth-Token", getAuthToken()).header("Accept", "application/json").content(gsonBuilder.toJson(beerDto).toString()))
+        mvc.perform(post("/api/beer")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Auth-Token", getAuthToken())
+                .header("Accept", "application/json")
+                .content(gsonBuilder.toJson(beerDto)))
+                .andExpect(status().isOk())
                 .andExpect(content().json(gsonBuilder.toJson(beerDto)));
         Assert.assertEquals(2, beerRepository.findAll().size());
+    }
 
+    @Test
+    public void updateBeerTest() throws Exception {
+        Gson gsonBuilder = new GsonBuilder().create();
+        BeerDto beerDto = beerRepository.findById(1L).map(modelMapper::fromBeerToBeerDto).orElseThrow(NullPointerException::new);
+        final String updateDesc = "UpdateDesc";
+        beerDto.setDescription(updateDesc);
+        mvc.perform(put("/api/beer")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Auth-Token", getAuthToken())
+                .header("Accept", "application/json")
+                .content(gsonBuilder.toJson(beerDto)))
+                .andExpect(status().isOk())
+                .andExpect(content().json(gsonBuilder.toJson(beerDto)));
+        Assert.assertEquals(1, beerRepository.findAll().size());
+        Assert.assertEquals(updateDesc, beerRepository.findById(1L).get().getDescription());
     }
 
     @Test
     public void deleteBeerTest() throws Exception {
+        Gson gsonBuilder = new GsonBuilder().create();
         final int countBefore = beerRepository.findAll().size();
+        BeerDto beerDto = beerRepository.findById(1L).map(modelMapper::fromBeerToBeerDto).orElseThrow(NullPointerException::new);
         mvc.perform(delete("/api/beer/1")
-                .contentType(MediaType.APPLICATION_JSON).header("X-Auth-Token", getAuthToken()).header("Accept", "application/json"))
-                .andExpect(status().isOk());
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Auth-Token", getAuthToken())
+                .header("Accept", "application/json"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(gsonBuilder.toJson(beerDto)));
         Assert.assertEquals(countBefore - 1, beerRepository.findAll().size());
     }
 

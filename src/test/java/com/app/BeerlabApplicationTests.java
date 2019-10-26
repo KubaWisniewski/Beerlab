@@ -2,11 +2,16 @@ package com.app;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
+@RunWith(Suite.class)
 @SpringBootTest
+@Suite.SuiteClasses({
+        BeerRestControllerIntegrationTest.class,
+        UserRestControllerIntegrationTest.class,
+        GroupRestControllerIntegrationTest.class
+})
 public class BeerlabApplicationTests {
 
     @Test

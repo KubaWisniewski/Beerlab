@@ -1,13 +1,10 @@
 package com.app;
 
 import com.app.model.*;
-import com.app.model.dto.BeerDto;
 import com.app.model.dto.GroupDto;
-import com.app.model.dto.UserDto;
 import com.app.model.modelMappers.ModelMapper;
+import com.app.payloads.requests.AddOrDeleteUserGroupPayload;
 import com.app.payloads.requests.LoginPayload;
-import com.app.payloads.requests.RegisterPayload;
-import com.app.payloads.responses.ApiPayload;
 import com.app.repository.BeerRepository;
 import com.app.repository.GroupRepository;
 import com.app.repository.RoleRepository;
@@ -29,11 +26,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Collections;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -70,18 +65,101 @@ public class GroupRestControllerIntegrationTest {
         user.setGroup(group);
         groupRepository.save(group);
         userRepository.save(user);
-
     }
 
     @Test
-    public void getGroup() throws Exception {
+    public void getGroupTest() throws Exception {
+        Gson gsonBuilder = new GsonBuilder().create();
+        GroupDto groupDto = groupRepository.findById(1L).map(modelMapper::fromGroupToGroupDto).orElseThrow(NullPointerException::new);
+        mvc.perform(get("/api/group/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Auth-Token", getAuthToken())
+                .header("Accept", "application/json"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(gsonBuilder.toJson(groupDto)));
+    }
+
+    @Test
+    public void getGroupsTest() throws Exception {
         Gson gsonBuilder = new GsonBuilder().create();
         GroupDto groupDto = groupRepository.findById(1L).map(modelMapper::fromGroupToGroupDto).orElseThrow(NullPointerException::new);
         mvc.perform(get("/api/group")
-                .contentType(MediaType.APPLICATION_JSON).header("X-Auth-Token", getAuthToken()).header("Accept", "application/json"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Auth-Token", getAuthToken())
+                .header("Accept", "application/json"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(gsonBuilder.toJson(Collections.singletonList(groupDto))));
+    }
+
+    @Test
+    public void deleteGroupTest() throws Exception {
+        Gson gsonBuilder = new GsonBuilder().create();
+        final int countBefore = beerRepository.findAll().size();
+        GroupDto groupDto = groupRepository.findById(1L).map(modelMapper::fromGroupToGroupDto).orElseThrow(NullPointerException::new);
+        mvc.perform(delete("/api/group/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Auth-Token", getAuthToken())
+                .header("Accept", "application/json"))
+                .andExpect(status().isOk())
                 .andExpect(content().json(gsonBuilder.toJson(groupDto)));
+        Assert.assertEquals(countBefore - 1, groupRepository.findAll().size());
+    }
 
+    @Test
+    public void addGroupTest() throws Exception {
+        Gson gsonBuilder = new GsonBuilder().create();
+        GroupDto groupDto = GroupDto.builder().description("Test description").name("Test").build();
+        mvc.perform(post("/api/group")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Auth-Token", getAuthToken())
+                .header("Accept", "application/json")
+                .content(gsonBuilder.toJson(groupDto)))
+                .andExpect(status().isOk())
+                .andExpect(content().json(gsonBuilder.toJson(groupDto)));
+        Assert.assertEquals(2, groupRepository.findAll().size());
+    }
 
+    @Test
+    public void updateGroupTest() throws Exception {
+        Gson gsonBuilder = new GsonBuilder().create();
+        final String updateDesc = "UpdateDesc";
+        GroupDto groupDto = groupRepository.findById(1L).map(modelMapper::fromGroupToGroupDto).orElseThrow(NullPointerException::new);
+        groupDto.setDescription(updateDesc);
+        mvc.perform(put("/api/group")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Auth-Token", getAuthToken())
+                .header("Accept", "application/json")
+                .content(gsonBuilder.toJson(groupDto)))
+                .andExpect(status().isOk())
+                .andExpect(content().json(gsonBuilder.toJson(groupDto)));
+        Assert.assertEquals(1, groupRepository.findAll().size());
+        Assert.assertEquals(updateDesc, groupRepository.findById(1L).get().getDescription());
+    }
+
+    @Test
+    public void addUserToGroupTest() throws Exception {
+        Gson gsonBuilder = new GsonBuilder().create();
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        userRepository.save(User.builder().email("add@test.com").username("AddTest").roles(Sets.newSet(roleRepository.findByRoleName(RoleName.ROLE_USER).get())).password(bCryptPasswordEncoder.encode("123")).balance(100.0).build());
+        mvc.perform(put("/api/group/addUser")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Auth-Token", getAuthToken())
+                .header("Accept", "application/json")
+                .content(gsonBuilder.toJson(AddOrDeleteUserGroupPayload.builder().email("add@test.com").groupName("TestGroup").build())))
+                .andExpect(status().isOk());
+        Assert.assertEquals(2, groupRepository.findById(1L).get().getMembers().size());
+    }
+
+    @Test
+    public void deleteUserToGroupTest() throws Exception {
+        Gson gsonBuilder = new GsonBuilder().create();
+        mvc.perform(delete("/api/group/deleteUser")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Auth-Token", getAuthToken())
+                .header("Accept", "application/json")
+                .content(gsonBuilder.toJson(AddOrDeleteUserGroupPayload.builder().email("test@test.com").groupName("TestGroup").build())))
+                .andExpect(status().isOk());
+        Assert.assertEquals(0, groupRepository.findById(1L).get().getMembers().size());
     }
 
     private String getAuthToken() throws Exception {

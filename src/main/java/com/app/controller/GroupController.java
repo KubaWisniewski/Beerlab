@@ -1,10 +1,8 @@
 package com.app.controller;
 
-import com.app.model.Beer;
 import com.app.model.Group;
 import com.app.model.dto.GroupDto;
-import com.app.model.dto.UserDto;
-import com.app.payloads.requests.AddUserGroupPayload;
+import com.app.payloads.requests.AddOrDeleteUserGroupPayload;
 import com.app.service.GroupService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -12,13 +10,13 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/group")
 @Api(tags = "Group controller")
 public class GroupController {
-    GroupService groupService;
+    private GroupService groupService;
 
     public GroupController(GroupService groupService) {
         this.groupService = groupService;
@@ -74,17 +72,16 @@ public class GroupController {
             response = Group.class
     )
     @PutMapping("/addUser")
-    public GroupDto addUserToGroup(@RequestBody AddUserGroupPayload addUserGroupPayload) {
-        return groupService.addUserToGroup(addUserGroupPayload.getEmail(), addUserGroupPayload.getGroupName());
+    public GroupDto addUserToGroup(@RequestBody AddOrDeleteUserGroupPayload addOrDeleteUserGroupPayload) {
+        return groupService.addUserToGroup(addOrDeleteUserGroupPayload.getEmail(), addOrDeleteUserGroupPayload.getGroupName());
     }
 
     @ApiOperation(
             value = "Delete user from the group ",
             response = Group.class
     )
-    @DeleteMapping("/deleteUser/{id}")
-    public GroupDto deleteUserFromGroup(@ApiParam(value = "User id", required = true) @PathVariable Long id, @ApiParam(value = "Group object", required = true) @RequestBody GroupDto groupDto) {
-        return groupService.deleteUserFromGroup(id, groupDto);
+    @DeleteMapping("/deleteUser")
+    public GroupDto deleteUserFromGroup(@RequestBody AddOrDeleteUserGroupPayload addOrDeleteUserGroupPayload) {
+        return groupService.deleteUserFromGroup(addOrDeleteUserGroupPayload.getEmail(), addOrDeleteUserGroupPayload.getGroupName());
     }
-
 }
