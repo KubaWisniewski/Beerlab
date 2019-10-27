@@ -12,7 +12,6 @@ import com.app.security.CustomUserDetails;
 import org.springframework.stereotype.Service;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,14 +43,6 @@ public class OrderService {
         return orderRepository.findById(id).map(modelMapper::fromOrderToOrderDto).orElseThrow(NullPointerException::new);
     }
 
-    public OrderDto updateOrder(OrderDto orderDto) {
-        if (orderDto == null)
-            throw new NullPointerException("Order is null");
-        Order order = modelMapper.fromOrderDtoToOrder(orderDto);
-        Order orderFromDb = orderRepository.save(order);
-        return modelMapper.fromOrderToOrderDto(orderFromDb);
-    }
-
     public OrderDto createOrder(Long userId, BeerDto beerDto) {
         User user = userRepository.findById(userId).orElseThrow(NullPointerException::new);
         Beer beer = beerRepository.findById(beerDto.getId()).orElseThrow(NullPointerException::new);
@@ -61,7 +52,6 @@ public class OrderService {
         OrderItem orderItem = OrderItem.builder().order(order).beer(beer).build();
         order.getOrderItems().add(orderItem);
         beer.setQuantity(beer.getQuantity() - 1);
-        user.setBalance(user.getBalance() - beer.getPrice());
         orderRepository.save(order);
         beerRepository.save(beer);
         userRepository.save(user);

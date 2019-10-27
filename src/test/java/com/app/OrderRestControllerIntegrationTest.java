@@ -15,7 +15,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.internal.util.collections.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,9 +24,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -62,8 +59,8 @@ public class OrderRestControllerIntegrationTest {
                     .forEach(role -> roleRepository.save(Role.builder().roleName(role).build()));
         }
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        User user = userRepository.save(User.builder().email("test@test.com").username("test").roles(Sets.newSet(roleRepository.findByRoleName(RoleName.ROLE_USER).get())).password(bCryptPasswordEncoder.encode("123")).build());
-        Beer beer = beerRepository.save(Beer.builder().brand("Aaa").description("Adesc").quantity(10).price(10.0).orderItems(new HashSet<OrderItem>()).build());
+        User user = userRepository.save(User.builder().email("test@test.com").username("test").roles(Collections.singletonList(roleRepository.findByRoleName(RoleName.ROLE_USER).get())).password(bCryptPasswordEncoder.encode("123")).build());
+        Beer beer = beerRepository.save(Beer.builder().brand("Aaa").description("Adesc").quantity(10).price(10.0).orderItems(new LinkedList<>()).build());
         Order order = new Order();
         order.setUser(user);
         order.setStatus(OrderStatus.INPROGRESS);
@@ -99,6 +96,21 @@ public class OrderRestControllerIntegrationTest {
                 .header("Accept", "application/json"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(gsonBuilder.toJson(orderDto)));
+    }
+
+    @Test
+    public void createOrder() throws Exception {
+        Gson gsonBuilder = new GsonBuilder().create();
+        BeerDto beerDto = beerRepository.findById(1L).map(modelMapper::fromBeerToBeerDto).orElseThrow(NullPointerException::new);
+        mvc.perform(post("/api/order")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Auth-Token", getAuthToken())
+                .header("Accept", "application/json")
+                .content(gsonBuilder.toJson(beerDto)))
+                .andExpect(status().isOk());
+        Assert.assertEquals(2, orderRepository.findAll().size());
+        beerDto.setQuantity(beerDto.getQuantity()-1);
+        Assert.assertEquals(beerDto,orderRepository.findById(2L).map(modelMapper::fromOrderToOrderDto).orElseThrow(NullPointerException::new).getOrderItemsDto().get(0).getBeerDto() );
     }
 
     private String getAuthToken() throws Exception {

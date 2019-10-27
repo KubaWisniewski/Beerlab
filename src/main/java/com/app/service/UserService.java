@@ -61,7 +61,7 @@ public class UserService {
                 registerPayload.getEmail()).password(registerPayload.getPassword()).build();
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         Role userRole = roleRepository.findByRoleName(RoleName.ROLE_USER).orElseThrow(NullPointerException::new);
-        user.setRoles(Collections.singleton(userRole));
+        user.setRoles(Collections.singletonList(userRole));
         userRepository.save(user);
     }
 }
