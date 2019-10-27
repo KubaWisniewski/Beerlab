@@ -6,9 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @AllArgsConstructor
@@ -24,7 +22,7 @@ public class Group {
     private String description;
 
     @OneToMany(mappedBy = "group", fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
-    private Set<User> members = new HashSet<>();
+    private List<User> members = new LinkedList<>();
 
     @Override
     public boolean equals(Object o) {

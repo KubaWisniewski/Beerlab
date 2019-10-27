@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -16,6 +18,6 @@ public class UserDto {
     private Long id;
     private String username;
     private String email;
-    private Set<RoleDto> rolesDto = new HashSet<>();
+    private List<RoleDto> rolesDto = new LinkedList<>();
     private Double balance;
 }

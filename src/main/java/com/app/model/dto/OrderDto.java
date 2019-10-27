@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -15,7 +17,7 @@ import java.util.Set;
 public class OrderDto {
     private Long id;
 
-    private Set<OrderItemDto> orderItemsDto = new HashSet<>();
+    private List<OrderItemDto> orderItemsDto = new LinkedList<>();
 
     private OrderStatus status;
 

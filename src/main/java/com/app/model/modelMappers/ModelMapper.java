@@ -15,7 +15,7 @@ public class ModelMapper {
                 .email(user.getEmail())
                 .balance(user.getBalance())
                 .username(user.getUsername())
-                .rolesDto(user.getRoles() == null ? null : user.getRoles().stream().map(this::fromRoleToRoleDto).collect(Collectors.toSet()))
+                .rolesDto(user.getRoles() == null ? null : user.getRoles().stream().map(this::fromRoleToRoleDto).collect(Collectors.toList()))
                 .build();
     }
 
@@ -26,7 +26,7 @@ public class ModelMapper {
                 .email(userDto.getEmail())
                 .balance(userDto.getBalance())
                 .username(userDto.getUsername())
-                .roles(userDto.getRolesDto() == null ? null : userDto.getRolesDto().stream().map(this::fromRoleDtoToRole).collect(Collectors.toSet()))
+                .roles(userDto.getRolesDto() == null ? null : userDto.getRolesDto().stream().map(this::fromRoleDtoToRole).collect(Collectors.toList()))
                 .build();
     }
 
@@ -60,7 +60,7 @@ public class ModelMapper {
                 null ? null : OrderDto.builder()
                 .id(order.getId())
                 .status(order.getStatus())
-                .orderItemsDto(order.getOrderItems() == null ? null : order.getOrderItems().stream().map(this::fromOrderItemToOrderItemDto).collect(Collectors.toSet()))
+                .orderItemsDto(order.getOrderItems() == null ? null : order.getOrderItems().stream().map(this::fromOrderItemToOrderItemDto).collect(Collectors.toList()))
                 .build();
     }
 
@@ -70,7 +70,7 @@ public class ModelMapper {
                 null ? null : Order.builder()
                 .id(orderDto.getId())
                 .status(orderDto.getStatus())
-                .orderItems(orderDto.getOrderItemsDto() == null ? null : orderDto.getOrderItemsDto().stream().map(this::fromOrderItemDtoToOrderItem).collect(Collectors.toSet()))
+                .orderItems(orderDto.getOrderItemsDto() == null ? null : orderDto.getOrderItemsDto().stream().map(this::fromOrderItemDtoToOrderItem).collect(Collectors.toList()))
                 .build();
     }
 
@@ -102,7 +102,7 @@ public class ModelMapper {
         return group == null ? null : GroupDto.builder()
                 .id(group.getId())
                 .name(group.getName())
-                .members(group.getMembers() == null ? null : group.getMembers().stream().map(this::fromUserToUserDto).collect(Collectors.toSet()))
+                .members(group.getMembers() == null ? null : group.getMembers().stream().map(this::fromUserToUserDto).collect(Collectors.toList()))
                 .description(group.getDescription())
                 .build();
     }
@@ -112,7 +112,7 @@ public class ModelMapper {
                 .id(groupDto.getId())
                 .name(groupDto.getName())
                 .description(groupDto.getDescription())
-                .members(groupDto.getMembers() == null ? null : groupDto.getMembers().stream().map(this::fromUserDtoToUser).collect(Collectors.toSet()))
+                .members(groupDto.getMembers() == null ? null : groupDto.getMembers().stream().map(this::fromUserDtoToUser).collect(Collectors.toList()))
                 .build();
     }
 }

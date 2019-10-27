@@ -10,7 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 @Suite.SuiteClasses({
         BeerRestControllerIntegrationTest.class,
         UserRestControllerIntegrationTest.class,
-        GroupRestControllerIntegrationTest.class
+        GroupRestControllerIntegrationTest.class,
+        OrderRestControllerIntegrationTest.class
 })
 public class BeerlabApplicationTests {
 
