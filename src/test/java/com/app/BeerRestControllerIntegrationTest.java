@@ -78,7 +78,7 @@ public class BeerRestControllerIntegrationTest {
                 .header("Accept", "application/json"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(gsonBuilder.toJson(beersDto)));
-        Assert.assertEquals(1, userRepository.findAll().size());
+        Assert.assertEquals(1, beerRepository.findAll().size());
 
     }
 

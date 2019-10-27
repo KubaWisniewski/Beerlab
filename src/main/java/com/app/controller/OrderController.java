@@ -1,16 +1,20 @@
 package com.app.controller;
 
-import com.app.model.Group;
+
 import com.app.model.dto.BeerDto;
 import com.app.model.dto.OrderDto;
 import com.app.security.CurrentUser;
 import com.app.security.CustomUserDetails;
 import com.app.service.OrderService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/order")
+@Api(value = "Order API")
 public class OrderController {
     private OrderService orderService;
 
@@ -23,7 +27,25 @@ public class OrderController {
             response = OrderDto.class
     )
     @PostMapping
-    public OrderDto addBeerToOrder(@CurrentUser CustomUserDetails customUserDetails, @RequestBody BeerDto beerDto) {
+    public OrderDto createOrder(@CurrentUser CustomUserDetails customUserDetails, @RequestBody BeerDto beerDto) {
         return orderService.createOrder(customUserDetails.getId(), beerDto);
+    }
+
+    @ApiOperation(
+            value = "Fetch all orders",
+            response = OrderDto.class
+    )
+    @GetMapping
+    public List<OrderDto> getAllOrders() {
+        return orderService.getAllOrders();
+    }
+
+    @ApiOperation(
+            value = "Get one order",
+            response = OrderDto.class
+    )
+    @GetMapping("/{id}")
+    public OrderDto getOrder(@RequestParam Long id) {
+        return orderService.getOrder(id);
     }
 }
