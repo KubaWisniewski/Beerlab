@@ -64,14 +64,13 @@ public class OrderRestControllerIntegrationTest {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         User user = userRepository.save(User.builder().email("test@test.com").username("test").roles(Sets.newSet(roleRepository.findByRoleName(RoleName.ROLE_USER).get())).password(bCryptPasswordEncoder.encode("123")).build());
         Beer beer = beerRepository.save(Beer.builder().brand("Aaa").description("Adesc").quantity(10).price(10.0).orderItems(new HashSet<OrderItem>()).build());
-        if (beer.getQuantity() <= 0)
-            throw new NullPointerException();
-        Order order = Order.builder().user(user).status(OrderStatus.INPROGRESS).orderItems(new HashSet<OrderItem>()).build();
+        Order order = new Order();
+        order.setUser(user);
+        order.setStatus(OrderStatus.INPROGRESS);
         OrderItem orderItem = OrderItem.builder().order(order).beer(beer).build();
         order.getOrderItems().add(orderItem);
-        beer.getOrderItems().add(orderItem);
+        beer.setQuantity(beer.getQuantity() - 1);
         orderRepository.save(order);
-
         beerRepository.save(beer);
         userRepository.save(user);
     }

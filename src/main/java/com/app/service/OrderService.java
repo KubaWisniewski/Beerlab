@@ -55,15 +55,15 @@ public class OrderService {
     public OrderDto createOrder(Long userId, BeerDto beerDto) {
         User user = userRepository.findById(userId).orElseThrow(NullPointerException::new);
         Beer beer = beerRepository.findById(beerDto.getId()).orElseThrow(NullPointerException::new);
-        if (beer.getQuantity() <= 0)
-            throw new NullPointerException();
-        Order order = Order.builder().user(user).status(OrderStatus.INPROGRESS).orderItems(new HashSet<OrderItem>()).build();
-        beer.setQuantity(beer.getQuantity() - 1);
+        Order order = new Order();
+        order.setUser(user);
+        order.setStatus(OrderStatus.INPROGRESS);
         OrderItem orderItem = OrderItem.builder().order(order).beer(beer).build();
         order.getOrderItems().add(orderItem);
-        beer.getOrderItems().add(orderItem);
-        beerRepository.save(beer);
+        beer.setQuantity(beer.getQuantity() - 1);
+        user.setBalance(user.getBalance() - beer.getPrice());
         orderRepository.save(order);
+        beerRepository.save(beer);
         userRepository.save(user);
         return modelMapper.fromOrderToOrderDto(order);
     }
