@@ -9,7 +9,6 @@ import com.app.model.modelMappers.ModelMapper;
 import com.app.payloads.requests.RegisterPayload;
 import com.app.repository.RoleRepository;
 import com.app.repository.UserRepository;
-import com.app.security.CustomUserDetails;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -62,6 +61,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         Role userRole = roleRepository.findByRoleName(RoleName.ROLE_USER).orElseThrow(NullPointerException::new);
         user.setRoles(Collections.singletonList(userRole));
+        user.setBalance(0.00);
         userRepository.save(user);
     }
 }
