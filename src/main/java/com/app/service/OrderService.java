@@ -4,6 +4,7 @@ import com.app.model.*;
 import com.app.model.dto.BeerDto;
 import com.app.model.dto.OrderDto;
 import com.app.model.modelMappers.ModelMapper;
+import com.app.payloads.requests.ChangeOrderStatusPayload;
 import com.app.repository.BeerRepository;
 import com.app.repository.OrderRepository;
 import com.app.repository.UserRepository;
@@ -55,6 +56,14 @@ public class OrderService {
         orderRepository.save(order);
         beerRepository.save(beer);
         userRepository.save(user);
+        return modelMapper.fromOrderToOrderDto(order);
+    }
+
+    public OrderDto changeOrderStatus(Long id, ChangeOrderStatusPayload changeOrderStatusPayload) {
+        Order order = orderRepository.findById(id).orElseThrow(NullPointerException::new);
+        System.out.println(changeOrderStatusPayload);
+        order.setStatus(OrderStatus.valueOf(changeOrderStatusPayload.getOrderStatus()));
+        orderRepository.save(order);
         return modelMapper.fromOrderToOrderDto(order);
     }
 }

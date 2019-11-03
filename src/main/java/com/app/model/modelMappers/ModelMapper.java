@@ -61,6 +61,8 @@ public class ModelMapper {
                 .id(order.getId())
                 .status(order.getStatus())
                 .orderItemsDto(order.getOrderItems() == null ? null : order.getOrderItems().stream().map(this::fromOrderItemToOrderItemDto).collect(Collectors.toList()))
+                .completeTime(order.getCompleteTime())
+                .startedTime(order.getStartedTime())
                 .build();
     }
 
@@ -71,6 +73,8 @@ public class ModelMapper {
                 .id(orderDto.getId())
                 .status(orderDto.getStatus())
                 .orderItems(orderDto.getOrderItemsDto() == null ? null : orderDto.getOrderItemsDto().stream().map(this::fromOrderItemDtoToOrderItem).collect(Collectors.toList()))
+                .completeTime(orderDto.getCompleteTime())
+                .startedTime(orderDto.getStartedTime())
                 .build();
     }
 

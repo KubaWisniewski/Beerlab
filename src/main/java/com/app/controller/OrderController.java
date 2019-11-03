@@ -3,6 +3,7 @@ package com.app.controller;
 
 import com.app.model.dto.BeerDto;
 import com.app.model.dto.OrderDto;
+import com.app.payloads.requests.ChangeOrderStatusPayload;
 import com.app.security.CurrentUser;
 import com.app.security.CustomUserDetails;
 import com.app.service.OrderService;
@@ -47,5 +48,10 @@ public class OrderController {
     @GetMapping("/{id}")
     public OrderDto getOrder(@PathVariable Long id) {
         return orderService.getOrder(id);
+    }
+
+    @PostMapping("/{id}")
+    public OrderDto changeOrderStatus(@PathVariable Long id, @RequestBody ChangeOrderStatusPayload changeOrderStatusPayload){
+        return orderService.changeOrderStatus(id,changeOrderStatusPayload);
     }
 }
