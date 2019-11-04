@@ -11,7 +11,8 @@ import org.springframework.boot.test.context.SpringBootTest;
         BeerRestControllerIntegrationTest.class,
         UserRestControllerIntegrationTest.class,
         GroupRestControllerIntegrationTest.class,
-        OrderRestControllerIntegrationTest.class
+        OrderRestControllerIntegrationTest.class,
+        AdminRestControllerIntegrtionTest.class
 })
 public class BeerlabApplicationTests {
 

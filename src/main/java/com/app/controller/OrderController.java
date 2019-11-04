@@ -1,6 +1,5 @@
 package com.app.controller;
 
-
 import com.app.model.dto.BeerDto;
 import com.app.model.dto.OrderDto;
 import com.app.payloads.requests.ChangeOrderStatusPayload;
@@ -50,6 +49,10 @@ public class OrderController {
         return orderService.getOrder(id);
     }
 
+    @ApiOperation(
+            value = "Change order status",
+            response = OrderDto.class
+    )
     @PostMapping("/{id}")
     public OrderDto changeOrderStatus(@PathVariable Long id, @RequestBody ChangeOrderStatusPayload changeOrderStatusPayload){
         return orderService.changeOrderStatus(id,changeOrderStatusPayload);

@@ -1,10 +1,8 @@
 package com.app.service;
 
-import com.app.model.Beer;
 import com.app.model.Group;
 import com.app.model.User;
 import com.app.model.dto.GroupDto;
-import com.app.model.dto.UserDto;
 import com.app.model.modelMappers.ModelMapper;
 import com.app.repository.GroupRepository;
 import com.app.repository.UserRepository;

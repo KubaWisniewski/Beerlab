@@ -61,7 +61,6 @@ public class OrderService {
 
     public OrderDto changeOrderStatus(Long id, ChangeOrderStatusPayload changeOrderStatusPayload) {
         Order order = orderRepository.findById(id).orElseThrow(NullPointerException::new);
-        System.out.println(changeOrderStatusPayload);
         order.setStatus(OrderStatus.valueOf(changeOrderStatusPayload.getOrderStatus()));
         orderRepository.save(order);
         return modelMapper.fromOrderToOrderDto(order);

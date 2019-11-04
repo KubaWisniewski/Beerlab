@@ -1,6 +1,5 @@
 package com.app.controller;
 
-import com.app.model.dto.OrderDto;
 import com.app.model.dto.UserDto;
 import com.app.security.CurrentUser;
 import com.app.security.CustomUserDetails;
