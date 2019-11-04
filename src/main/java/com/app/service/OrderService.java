@@ -48,8 +48,8 @@ public class OrderService {
 
     public int getUserQueuePosition(Long userDetails) {
         List<OrderDto> allOrdersInQueue = getQueueOrders();
-        User u = userRepository.findById(userDetails).orElseThrow(NullPointerException::new);
-        List<Order> userOrders = u.getOrders().stream().filter(order -> order.getStatus() != OrderStatus.CLOSED && order.getStatus() != OrderStatus.COMPLETED).collect(Collectors.toList());
+        User user = userRepository.findById(userDetails).orElseThrow(NullPointerException::new);
+        List<Order> userOrders = user.getOrders().stream().filter(order -> order.getStatus() != OrderStatus.CLOSED && order.getStatus() != OrderStatus.COMPLETED).collect(Collectors.toList());
         int counter = 0;
         for (OrderDto o : allOrdersInQueue) {
 
