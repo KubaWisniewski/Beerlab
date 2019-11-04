@@ -32,9 +32,9 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-ddTHH:mm:ss")
     private LocalDateTime startedTime;
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-ddTHH:mm:ss")
     private LocalDateTime completeTime;
     @Override
     public boolean equals(Object o) {

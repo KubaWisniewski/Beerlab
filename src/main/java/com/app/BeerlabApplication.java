@@ -1,23 +1,16 @@
 package com.app;
 
-import com.app.model.Beer;
-import com.app.model.Role;
-import com.app.model.RoleName;
-import com.app.model.User;
 import com.app.repository.BeerRepository;
 import com.app.repository.RoleRepository;
 import com.app.repository.UserRepository;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.session.jdbc.config.annotation.web.http.EnableJdbcHttpSession;
 
 import javax.annotation.PostConstruct;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.TimeZone;
 
 @SpringBootApplication
 @EntityScan(basePackageClasses = {
@@ -42,7 +35,7 @@ public class BeerlabApplication {
 
     @PostConstruct
     void init() {
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+        TimeZone.setDefault(TimeZone.getTimeZone("CET"));
     }
 
 //    public void run(String... args) throws Exception {

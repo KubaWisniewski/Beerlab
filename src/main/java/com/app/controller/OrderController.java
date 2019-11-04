@@ -51,7 +51,12 @@ public class OrderController {
     }
 
     @PostMapping("/{id}")
-    public OrderDto changeOrderStatus(@PathVariable Long id, @RequestBody ChangeOrderStatusPayload changeOrderStatusPayload){
-        return orderService.changeOrderStatus(id,changeOrderStatusPayload);
+    public OrderDto changeOrderStatus(@PathVariable Long id, @RequestBody ChangeOrderStatusPayload changeOrderStatusPayload) {
+        return orderService.changeOrderStatus(id, changeOrderStatusPayload);
+    }
+
+    @PostMapping("/orderPosition")
+    public Integer getQueuePosition(@CurrentUser CustomUserDetails customUserDetails) {
+        return orderService.getUserQueuePosition(customUserDetails.getId());
     }
 }
