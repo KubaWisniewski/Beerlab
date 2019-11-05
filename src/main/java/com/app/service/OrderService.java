@@ -46,19 +46,15 @@ public class OrderService {
         return orderRepository.findByUserId(userDetails.getId()).stream().map(modelMapper::fromOrderToOrderDto).collect(Collectors.toList());
     }
 
-    public int getUserQueuePosition(Long userDetails) {
+    public int getUserQueuePosition(Long orderId) {
         List<OrderDto> allOrdersInQueue = getQueueOrders();
-        User user = userRepository.findById(userDetails).orElseThrow(NullPointerException::new);
-        List<Order> userOrders = user.getOrders().stream().filter(order -> order.getStatus() != OrderStatus.CLOSED && order.getStatus() != OrderStatus.COMPLETED).collect(Collectors.toList());
+        Order order = orderRepository.findById(orderId).orElseThrow(NullPointerException::new);
         int counter = 0;
         for (OrderDto o : allOrdersInQueue) {
-
-            for (Order userOrder : userOrders) {
-                if (o.getId() != userOrder.getId()) {
-                    counter += 1;
-                } else {
-                    return counter + 1;
-                }
+            if (o.getId() != order.getId()) {
+                counter += 1;
+            } else {
+                return counter;
             }
         }
         return counter;
