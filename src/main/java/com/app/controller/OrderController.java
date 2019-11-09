@@ -2,6 +2,7 @@ package com.app.controller;
 
 import com.app.model.dto.BeerDto;
 import com.app.model.dto.OrderDto;
+import com.app.payloads.requests.AddBeerToOrderPayload;
 import com.app.payloads.requests.ChangeOrderStatusPayload;
 import com.app.security.CurrentUser;
 import com.app.security.CustomUserDetails;
@@ -27,8 +28,8 @@ public class OrderController {
             response = OrderDto.class
     )
     @PostMapping
-    public OrderDto createOrder(@CurrentUser CustomUserDetails customUserDetails, @RequestBody BeerDto beerDto) {
-        return orderService.createOrder(customUserDetails.getId(), beerDto);
+    public OrderDto createOrder(@CurrentUser CustomUserDetails customUserDetails, @RequestBody AddBeerToOrderPayload addBeerToOrderPayload) {
+        return orderService.order(customUserDetails.getId(), addBeerToOrderPayload);
     }
 
     @ApiOperation(
@@ -58,7 +59,11 @@ public class OrderController {
         return orderService.changeOrderStatus(id, changeOrderStatusPayload);
     }
 
- @PostMapping("/orderPosition/{id}")
+    @ApiOperation(
+            value = "Get order position",
+            response = Integer.class
+    )
+    @PostMapping("/orderPosition/{id}")
     public Integer getQueuePosition(@PathVariable Long id) {
         return orderService.getUserQueuePosition(id);
     }

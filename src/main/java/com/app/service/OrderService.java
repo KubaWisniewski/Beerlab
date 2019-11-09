@@ -1,20 +1,18 @@
 package com.app.service;
 
 import com.app.model.*;
-import com.app.model.dto.BeerDto;
 import com.app.model.dto.OrderDto;
 import com.app.model.modelMappers.ModelMapper;
+import com.app.payloads.requests.AddBeerToOrderPayload;
 import com.app.payloads.requests.ChangeOrderStatusPayload;
 import com.app.repository.BeerRepository;
 import com.app.repository.OrderRepository;
 import com.app.repository.UserRepository;
-import com.app.security.CurrentUser;
-import com.app.security.CustomUserDetails;
 import org.springframework.stereotype.Service;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,15 +33,15 @@ public class OrderService {
     }
 
     public List<OrderDto> getAllOrders() {
-        return orderRepository.findAll().stream().sorted(Comparator.comparing(order -> order.getStartedTime())).map(modelMapper::fromOrderToOrderDto).collect(Collectors.toList());
+        return orderRepository.findAll().stream().sorted(Comparator.comparing(Order::getStartedTime)).map(modelMapper::fromOrderToOrderDto).collect(Collectors.toList());
     }
 
     List<OrderDto> getQueueOrders() {
         return orderRepository.findAll().stream().filter(order -> order.getStatus() != OrderStatus.CLOSED && order.getStatus() != OrderStatus.COMPLETED).sorted(Comparator.comparing(order -> order.getStartedTime())).map(modelMapper::fromOrderToOrderDto).collect(Collectors.toList());
     }
 
-    public List<OrderDto> getAllUserOrders(@ApiIgnore @CurrentUser CustomUserDetails userDetails) {
-        return orderRepository.findByUserId(userDetails.getId()).stream().map(modelMapper::fromOrderToOrderDto).collect(Collectors.toList());
+    public List<OrderDto> getAllUserOrders(Long id) {
+        return orderRepository.findByUserId(id).stream().map(modelMapper::fromOrderToOrderDto).collect(Collectors.toList());
     }
 
     public int getUserQueuePosition(Long orderId) {
@@ -64,19 +62,27 @@ public class OrderService {
         return orderRepository.findById(id).map(modelMapper::fromOrderToOrderDto).orElseThrow(NullPointerException::new);
     }
 
-    public OrderDto createOrder(Long userId, BeerDto beerDto) {
-        User user = userRepository.findById(userId).orElseThrow(NullPointerException::new);
-        Beer beer = beerRepository.findById(beerDto.getId()).orElseThrow(NullPointerException::new);
-        Order order = new Order();
-        order.setUser(user);
-        order.setStatus(OrderStatus.QUEUED);
-        OrderItem orderItem = OrderItem.builder().order(order).beer(beer).build();
+    public OrderDto order(Long id, AddBeerToOrderPayload addBeerToOrderPayload) {
+        if (beerRepository.findById(addBeerToOrderPayload.getBeerId()).get().getQuantity() == 0)
+            throw new NullPointerException();
+        if (!orderRepository.findByUserIdAndStatus(id, OrderStatus.NOT_PAID).isPresent())
+            createEmptyOrder(id);
+        Order order = orderRepository.findByUserIdAndStatus(id, OrderStatus.NOT_PAID).orElseThrow(NullPointerException::new);
+        if (!order.getOrderItems().isEmpty()
+                && order.getOrderItems().stream().anyMatch(x -> x.getBeer().getId().equals(addBeerToOrderPayload.getBeerId()))) {
+            OrderItem orderItem = order.getOrderItems().stream().filter(x -> x.getBeer().getId().equals(addBeerToOrderPayload.getBeerId())).findFirst().get();
+            orderItem.setQuantity(orderItem.getQuantity() + addBeerToOrderPayload.getQuantity());
+            Beer beer = beerRepository.findById(addBeerToOrderPayload.getBeerId()).get();
+            beer.setQuantity(beer.getQuantity() - addBeerToOrderPayload.getQuantity());
+            beerRepository.save(beer);
+            orderRepository.save(order);
+            return modelMapper.fromOrderToOrderDto(order);
+        }
+        Beer beer = beerRepository.findById(addBeerToOrderPayload.getBeerId()).get();
+        OrderItem orderItem = OrderItem.builder().quantity(addBeerToOrderPayload.getQuantity()).unitPrice(beer.getPrice()).beer(beer).order(order).build();
         order.getOrderItems().add(orderItem);
-        order.setStartedTime(LocalDateTime.now());
-        beer.setQuantity(beer.getQuantity() - 1);
-        orderRepository.save(order);
         beerRepository.save(beer);
-        userRepository.save(user);
+        orderRepository.save(order);
         return modelMapper.fromOrderToOrderDto(order);
     }
 
@@ -88,5 +94,15 @@ public class OrderService {
         order.setStatus(OrderStatus.valueOf(changeOrderStatusPayload.getOrderStatus()));
         orderRepository.save(order);
         return modelMapper.fromOrderToOrderDto(order);
+    }
+
+    private void createEmptyOrder(Long userId) {
+        orderRepository.save(Order
+                .builder()
+                .status(OrderStatus.NOT_PAID)
+                .startedTime(LocalDateTime.now())
+                .orderItems(new LinkedList<>())
+                .user(userRepository.findById(userId).orElseThrow(NullPointerException::new))
+                .build());
     }
 }

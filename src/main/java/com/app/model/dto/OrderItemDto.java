@@ -12,4 +12,6 @@ import lombok.NoArgsConstructor;
 public class OrderItemDto {
     private long id;
     private BeerDto beerDto;
+    private Double unitPrice;
+    private Integer quantity;
 }

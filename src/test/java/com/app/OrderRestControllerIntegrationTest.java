@@ -1,9 +1,9 @@
 package com.app;
 
 import com.app.model.*;
-import com.app.model.dto.BeerDto;
 import com.app.model.dto.OrderDto;
 import com.app.model.modelMappers.ModelMapper;
+import com.app.payloads.requests.AddBeerToOrderPayload;
 import com.app.payloads.requests.LoginPayload;
 import com.app.repository.BeerRepository;
 import com.app.repository.OrderRepository;
@@ -101,16 +101,13 @@ public class OrderRestControllerIntegrationTest {
     @Test
     public void createOrder() throws Exception {
         Gson gsonBuilder = new GsonBuilder().create();
-        BeerDto beerDto = beerRepository.findById(1L).map(modelMapper::fromBeerToBeerDto).orElseThrow(NullPointerException::new);
         mvc.perform(post("/api/order")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-Auth-Token", getAuthToken())
                 .header("Accept", "application/json")
-                .content(gsonBuilder.toJson(beerDto)))
+                .content(gsonBuilder.toJson(AddBeerToOrderPayload.builder().beerId(1L).quantity(1).build())))
                 .andExpect(status().isOk());
         Assert.assertEquals(2, orderRepository.findAll().size());
-        beerDto.setQuantity(beerDto.getQuantity()-1);
-        Assert.assertEquals(beerDto,orderRepository.findById(2L).map(modelMapper::fromOrderToOrderDto).orElseThrow(NullPointerException::new).getOrderItemsDto().get(0).getBeerDto() );
     }
 
     private String getAuthToken() throws Exception {

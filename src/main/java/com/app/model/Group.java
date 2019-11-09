@@ -29,22 +29,12 @@ public class Group {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Group group = (Group) o;
-        return Objects.equals(id, group.id) &&
-                Objects.equals(name, group.name) &&
-                Objects.equals(description, group.description);
+        return Objects.equals(id, group.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description);
+        return Objects.hash(id);
     }
 
-    @Override
-    public String toString() {
-        return "Group{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                '}';
-    }
 }

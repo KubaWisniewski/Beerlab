@@ -40,7 +40,7 @@ public class GroupService {
 
     public GroupDto addOrUpdateGroup(GroupDto groupDto) {
         if (groupDto == null)
-            throw new NullPointerException("Beer is null");
+            throw new NullPointerException("Group is null");
         Group group = modelMapper.fromGroupDtoToGroup(groupDto);
         groupRepository.save(group);
         return modelMapper.fromGroupToGroupDto(group);
