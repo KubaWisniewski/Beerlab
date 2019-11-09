@@ -4,11 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
-import java.util.*;
+import java.time.LocalDate;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+
+import static javax.persistence.EnumType.STRING;
 
 @Entity(name = "user")
 @Data
@@ -32,6 +38,10 @@ public class User implements Serializable {
     @NotBlank
     private String password;
 
+    @Column(name = "user_gender")
+    @Enumerated(value = STRING)
+    private Gender gender;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -48,6 +58,9 @@ public class User implements Serializable {
     @JoinColumn(name = "group_id")
     private Group group;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dateOfBirth;
+
     public User(User user) {
         id = user.getId();
         username = user.getUsername();
@@ -55,7 +68,9 @@ public class User implements Serializable {
         password = user.getPassword();
         roles = user.getRoles();
         balance = user.getBalance();
+        gender = user.getGender();
         orders = user.getOrders();
+        dateOfBirth = user.getDateOfBirth();
     }
 
     @Override

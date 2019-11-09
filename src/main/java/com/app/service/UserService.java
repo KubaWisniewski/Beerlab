@@ -1,6 +1,7 @@
 package com.app.service;
 
 import com.app.exception.UserRegisterException;
+import com.app.model.Gender;
 import com.app.model.Role;
 import com.app.model.RoleName;
 import com.app.model.User;
@@ -16,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Collections;
 
 @Service
@@ -62,6 +64,26 @@ public class UserService {
         Role userRole = roleRepository.findByRoleName(RoleName.ROLE_USER).orElseThrow(NullPointerException::new);
         user.setRoles(Collections.singletonList(userRole));
         user.setBalance(0.00);
+        user.setDateOfBirth(LocalDate.parse(registerPayload.getDateOfBirth()));
+        Gender gender = parseGenderFromFrontend(registerPayload);
+        user.setGender(gender);
         userRepository.save(user);
+    }
+
+    public Gender parseGenderFromFrontend(RegisterPayload registerPayload) {
+        Gender gender = Gender.OTHER;
+        switch (registerPayload.getGender()) {
+            case "Mezczyzna":
+                gender = Gender.MALE;
+                break;
+            case "Kobieta":
+                gender = Gender.FEMALE;
+                break;
+            case "Inna":
+                gender = Gender.OTHER;
+                break;
+        }
+        return gender;
+
     }
 }
