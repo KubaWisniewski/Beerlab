@@ -70,6 +70,7 @@ public class User implements Serializable {
         balance = user.getBalance();
         gender = user.getGender();
         orders = user.getOrders();
+        dateOfBirth = user.getDateOfBirth();
     }
 
     @Override
