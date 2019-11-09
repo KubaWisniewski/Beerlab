@@ -16,6 +16,8 @@ public class ModelMapper {
                 .balance(user.getBalance())
                 .username(user.getUsername())
                 .rolesDto(user.getRoles() == null ? null : user.getRoles().stream().map(this::fromRoleToRoleDto).collect(Collectors.toList()))
+                .gender(user.getGender())
+                .dateOfBirth(user.getDateOfBirth())
                 .build();
     }
 
@@ -27,6 +29,8 @@ public class ModelMapper {
                 .balance(userDto.getBalance())
                 .username(userDto.getUsername())
                 .roles(userDto.getRolesDto() == null ? null : userDto.getRolesDto().stream().map(this::fromRoleDtoToRole).collect(Collectors.toList()))
+                .gender(userDto.getGender())
+                .dateOfBirth(userDto.getDateOfBirth())
                 .build();
     }
 

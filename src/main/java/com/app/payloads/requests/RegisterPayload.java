@@ -1,5 +1,6 @@
 package com.app.payloads.requests;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,4 +23,8 @@ public class RegisterPayload {
 
     @NotBlank
     private String password;
+    @JsonProperty("gender")
+    @NotBlank
+    private String gender;
+    private String dateOfBirth;
 }
