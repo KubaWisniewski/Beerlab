@@ -52,11 +52,23 @@ public class ModelMapper {
     }
 
     public OrderItemDto fromOrderItemToOrderItemDto(OrderItem orderItem) {
-        return orderItem == null ? null : OrderItemDto.builder().id(orderItem.getId()).beerDto(orderItem.getBeer() == null ? null : fromBeerToBeerDto(orderItem.getBeer())).build();
+        return orderItem ==
+                null ? null : OrderItemDto.builder()
+                .id(orderItem.getId())
+                .quantity(orderItem.getQuantity())
+                .unitPrice(orderItem.getUnitPrice())
+                .beerDto(orderItem.getBeer() == null ? null : fromBeerToBeerDto(orderItem.getBeer()))
+                .build();
     }
 
     public OrderItem fromOrderItemDtoToOrderItem(OrderItemDto orderItemDto) {
-        return orderItemDto == null ? null : OrderItem.builder().id(orderItemDto.getId()).beer(orderItemDto.getBeerDto() == null ? null : fromBeerDtoToBeer(orderItemDto.getBeerDto())).build();
+        return orderItemDto ==
+                null ? null : OrderItem.builder()
+                .id(orderItemDto.getId())
+                .quantity(orderItemDto.getQuantity())
+                .unitPrice(orderItemDto.getUnitPrice())
+                .beer(orderItemDto.getBeerDto() == null ? null : fromBeerDtoToBeer(orderItemDto.getBeerDto()))
+                .build();
     }
 
     public OrderDto fromOrderToOrderDto(Order order) {
