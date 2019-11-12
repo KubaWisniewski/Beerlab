@@ -3,10 +3,13 @@ package com.app.controller;
 import com.app.model.Beer;
 import com.app.model.dto.BeerDto;
 import com.app.service.BeerService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -33,8 +36,13 @@ public class BeerController {
             response = Beer.class
     )
     @PostMapping
-    public BeerDto addBeer(@RequestBody BeerDto beerDto) {
-        return beerService.addOrUpdateBeer(beerDto);
+    public BeerDto addBeer(@RequestPart(value = "file", required = false) MultipartFile uploadfile, @RequestParam("beerDto") String beerDto) throws IOException, IllegalAccessException {
+        try {
+            return beerService.addOrUpdateBeer(new ObjectMapper().readValue(beerDto, BeerDto.class), uploadfile);
+        } catch (IOException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @ApiOperation(
@@ -60,7 +68,12 @@ public class BeerController {
             response = Beer.class
     )
     @PutMapping
-    public BeerDto updateBeer(@RequestBody BeerDto beerDto) {
-        return beerService.addOrUpdateBeer(beerDto);
+    public BeerDto updateBeer(@RequestPart(value = "file", required = false) MultipartFile uploadfile, @RequestParam("beerDto") String beerDto) throws IOException, IllegalAccessException {
+        try {
+            return beerService.addOrUpdateBeer(new ObjectMapper().readValue(beerDto, BeerDto.class), uploadfile);
+        } catch (IOException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

@@ -27,6 +27,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -82,7 +84,7 @@ public class UserRestControllerIntegrationTest {
         mvc.perform(post("/api/auth/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Accept", "application/json")
-                .content(gsonBuilder.toJson(RegisterPayload.builder().email("newTest@test.com").username("newTest").password("123").build())))
+                .content(gsonBuilder.toJson(RegisterPayload.builder().email("newTest@test.com").username("newTest").gender("Mezczyzna").dateOfBirth(LocalDate.now().toString()).password("123").build())))
                 .andExpect(status().isOk())
                 .andExpect(content().json(gsonBuilder.toJson(ApiPayload.builder().success(true).message("User registered successfully").build())));
         Assert.assertEquals(2, userRepository.findAll().size());

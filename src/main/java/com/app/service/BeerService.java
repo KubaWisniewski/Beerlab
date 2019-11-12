@@ -4,8 +4,11 @@ import com.app.model.Beer;
 import com.app.model.dto.BeerDto;
 import com.app.model.modelMappers.ModelMapper;
 import com.app.repository.BeerRepository;
+import com.app.utils.FileManager;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,10 +16,12 @@ import java.util.stream.Collectors;
 public class BeerService {
     private BeerRepository beerRepository;
     private ModelMapper modelMapper;
+    private FileManager fileManager;
 
-    public BeerService(BeerRepository beerRepository, ModelMapper modelMapper) {
+    public BeerService(BeerRepository beerRepository, ModelMapper modelMapper, FileManager fileManager) {
         this.beerRepository = beerRepository;
         this.modelMapper = modelMapper;
+        this.fileManager = fileManager;
     }
 
     public List<BeerDto> getBeers() {
@@ -35,10 +40,14 @@ public class BeerService {
 
     }
 
-    public BeerDto addOrUpdateBeer(BeerDto beerDto) {
+    public BeerDto addOrUpdateBeer(BeerDto beerDto, MultipartFile multipartFile) throws IOException, IllegalAccessException {
         if (beerDto == null)
             throw new NullPointerException("Beer is null");
         Beer beer = modelMapper.fromBeerDtoToBeer(beerDto);
+        if (multipartFile != null && beerDto.getImgUrl() == null)
+            beer.setImgUrl(fileManager.addFile(multipartFile));
+        else if (multipartFile != null && !beerDto.getImgUrl().equals(""))
+            fileManager.updateFile(multipartFile, beerDto.getImgUrl());
         Beer beerFromDb = beerRepository.save(beer);
         return modelMapper.fromBeerToBeerDto(beerFromDb);
     }
@@ -46,7 +55,7 @@ public class BeerService {
     public BeerDto deleteBeer(Long id) {
         Beer beer = beerRepository.findById(id).orElseThrow(NullPointerException::new);
         beerRepository.delete(beer);
+        fileManager.removeFile(beer.getImgUrl());
         return modelMapper.fromBeerToBeerDto(beer);
-
     }
 }
