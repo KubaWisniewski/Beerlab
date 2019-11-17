@@ -18,6 +18,7 @@ import java.util.List;
 public class UserDto {
     private Long id;
     private String username;
+    private String password;
     private Gender gender;
     private String email;
     private List<RoleDto> rolesDto = new LinkedList<>();

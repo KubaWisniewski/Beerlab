@@ -2,14 +2,14 @@ package com.app.controller;
 
 import com.app.model.dto.OrderDto;
 import com.app.model.dto.UserDto;
+import com.app.payloads.requests.PayPalPayload;
 import com.app.security.CurrentUser;
 import com.app.security.CustomUserDetails;
 import com.app.service.OrderService;
 import com.app.service.UserService;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
@@ -52,4 +52,11 @@ public class UserController {
     public List<OrderDto> getUserOrders(@ApiIgnore @CurrentUser CustomUserDetails userDetails) {
         return orderService.getAllUserOrders(userDetails.getId());
     }
+
+    @PostMapping("/addMoney")
+    public ResponseEntity addBalanceForUser(@ApiIgnore @CurrentUser CustomUserDetails userDetails, @RequestBody PayPalPayload payPalPayload) {
+        userService.addBalanceForUser(userDetails.getId(), payPalPayload);
+        return ResponseEntity.ok().body("OK");
+    }
 }
+

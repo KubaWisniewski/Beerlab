@@ -7,6 +7,8 @@ import com.app.model.RoleName;
 import com.app.model.User;
 import com.app.model.dto.UserDto;
 import com.app.model.modelMappers.ModelMapper;
+import com.app.payloads.domain.Transactions;
+import com.app.payloads.requests.PayPalPayload;
 import com.app.payloads.requests.RegisterPayload;
 import com.app.repository.RoleRepository;
 import com.app.repository.UserRepository;
@@ -85,5 +87,19 @@ public class UserService {
         }
         return gender;
 
+    }
+
+    public void addBalanceForUser(Long id, PayPalPayload payPalPayload) {
+        if (id == null || payPalPayload == null) {
+            throw new NullPointerException("User id or Paypal data is null");
+        }
+        double amountToAdd = 0;
+        User user = userRepository.findById(id).orElseThrow(NullPointerException::new);
+        UserDto userDto = modelMapper.fromUserToUserDto(user);
+        for (Transactions p : payPalPayload.getTransactions()) {
+            amountToAdd = p.getAmount().getTotal() * 2; // magic number 1$ = 2 kufle maybe in future Admin could change 1$ = x Kufle
+        }
+        userDto.setBalance(userDto.getBalance() + amountToAdd);
+        userRepository.save(modelMapper.fromUserDtoToUser(userDto));
     }
 }
