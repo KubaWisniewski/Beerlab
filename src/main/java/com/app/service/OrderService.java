@@ -62,6 +62,10 @@ public class OrderService {
         return orderRepository.findById(id).map(modelMapper::fromOrderToOrderDto).orElseThrow(NullPointerException::new);
     }
 
+    public OrderDto getNotPaidUserOrder(Long id) {
+        return orderRepository.findByUserIdAndStatus(id, OrderStatus.NOT_PAID).map(modelMapper::fromOrderToOrderDto).orElseThrow(NullPointerException::new);
+    }
+
     public OrderDto order(Long id, AddBeerToOrderPayload addBeerToOrderPayload) {
         if (beerRepository.findById(addBeerToOrderPayload.getBeerId()).get().getQuantity() == 0)
             throw new NullPointerException();
