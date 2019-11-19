@@ -53,6 +53,11 @@ public class UserController {
         return orderService.getAllUserOrders(userDetails.getId());
     }
 
+    @GetMapping("/order")
+    public OrderDto getNotPaidOrder(@ApiIgnore @CurrentUser CustomUserDetails userDetails) {
+        return orderService.getNotPaidUserOrder(userDetails.getId());
+    }
+
     @PostMapping("/addMoney")
     public ResponseEntity addBalanceForUser(@ApiIgnore @CurrentUser CustomUserDetails userDetails, @RequestBody PayPalPayload payPalPayload) {
         userService.addBalanceForUser(userDetails.getId(), payPalPayload);
