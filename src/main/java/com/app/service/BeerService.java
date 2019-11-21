@@ -17,11 +17,13 @@ public class BeerService {
     private BeerRepository beerRepository;
     private ModelMapper modelMapper;
     private FileManager fileManager;
+    private AmazonClient amazonClient;
 
-    public BeerService(BeerRepository beerRepository, ModelMapper modelMapper, FileManager fileManager) {
+    public BeerService(BeerRepository beerRepository, ModelMapper modelMapper, FileManager fileManager, AmazonClient amazonClient) {
         this.beerRepository = beerRepository;
         this.modelMapper = modelMapper;
         this.fileManager = fileManager;
+        this.amazonClient = amazonClient;
     }
 
     public List<BeerDto> getBeers() {
@@ -45,17 +47,19 @@ public class BeerService {
             throw new NullPointerException("Beer is null");
         Beer beer = modelMapper.fromBeerDtoToBeer(beerDto);
         if (multipartFile != null && beerDto.getImgUrl() == null)
-            beer.setImgUrl(fileManager.addFile(multipartFile));
-        else if (multipartFile != null && !beerDto.getImgUrl().equals(""))
-            fileManager.updateFile(multipartFile, beerDto.getImgUrl());
+            beer.setImgUrl(amazonClient.uploadFile(multipartFile));
+        else if (multipartFile != null && !beerDto.getImgUrl().equals("")) {
+            amazonClient.deleteFileFromS3Bucket(beerDto.getImgUrl());
+            beer.setImgUrl(amazonClient.uploadFile(multipartFile));
+        }
         Beer beerFromDb = beerRepository.save(beer);
         return modelMapper.fromBeerToBeerDto(beerFromDb);
     }
 
     public BeerDto deleteBeer(Long id) {
         Beer beer = beerRepository.findById(id).orElseThrow(NullPointerException::new);
+        amazonClient.deleteFileFromS3Bucket(beer.getImgUrl());
         beerRepository.delete(beer);
-        fileManager.removeFile(beer.getImgUrl());
         return modelMapper.fromBeerToBeerDto(beer);
     }
 }
