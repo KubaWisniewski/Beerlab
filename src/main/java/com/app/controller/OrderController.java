@@ -1,6 +1,5 @@
 package com.app.controller;
 
-import com.app.model.dto.BeerDto;
 import com.app.model.dto.OrderDto;
 import com.app.payloads.requests.AddBeerToOrderPayload;
 import com.app.payloads.requests.ChangeOrderStatusPayload;
@@ -39,6 +38,11 @@ public class OrderController {
     @GetMapping
     public List<OrderDto> getAllOrders() {
         return orderService.getAllOrders();
+    }
+
+    @GetMapping("/current")
+    public List<OrderDto> getAllCurrentOrders() {
+        return orderService.getQueueOrders();
     }
 
     @ApiOperation(
