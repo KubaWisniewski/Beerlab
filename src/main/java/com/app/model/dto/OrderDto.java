@@ -25,4 +25,5 @@ public class OrderDto {
     private LocalDateTime startedTime;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime completeTime;
+    private Double totalPrice;
 }
