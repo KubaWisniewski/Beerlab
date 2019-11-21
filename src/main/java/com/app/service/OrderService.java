@@ -1,6 +1,9 @@
 package com.app.service;
 
-import com.app.model.*;
+import com.app.model.Beer;
+import com.app.model.Order;
+import com.app.model.OrderItem;
+import com.app.model.OrderStatus;
 import com.app.model.dto.OrderDto;
 import com.app.model.modelMappers.ModelMapper;
 import com.app.payloads.requests.AddBeerToOrderPayload;
@@ -36,7 +39,7 @@ public class OrderService {
         return orderRepository.findAll().stream().sorted(Comparator.comparing(Order::getStartedTime)).map(modelMapper::fromOrderToOrderDto).collect(Collectors.toList());
     }
 
-    List<OrderDto> getQueueOrders() {
+    public List<OrderDto> getQueueOrders() {
         return orderRepository.findAll().stream().filter(order -> order.getStatus() != OrderStatus.CLOSED && order.getStatus() != OrderStatus.COMPLETED).sorted(Comparator.comparing(order -> order.getStartedTime())).map(modelMapper::fromOrderToOrderDto).collect(Collectors.toList());
     }
 
@@ -74,6 +77,7 @@ public class OrderService {
             orderItem.setQuantity(orderItem.getQuantity() + addBeerToOrderPayload.getQuantity());
             Beer beer = beerRepository.findById(addBeerToOrderPayload.getBeerId()).get();
             beer.setQuantity(beer.getQuantity() - addBeerToOrderPayload.getQuantity());
+            order.setTotalPrice(order.getOrderItems().stream().mapToDouble(value -> value.getUnitPrice() * value.getQuantity()).sum());
             beerRepository.save(beer);
             orderRepository.save(order);
             return modelMapper.fromOrderToOrderDto(order);
@@ -81,6 +85,7 @@ public class OrderService {
         Beer beer = beerRepository.findById(addBeerToOrderPayload.getBeerId()).get();
         OrderItem orderItem = OrderItem.builder().quantity(addBeerToOrderPayload.getQuantity()).unitPrice(beer.getPrice()).beer(beer).order(order).build();
         order.getOrderItems().add(orderItem);
+        order.setTotalPrice(order.getOrderItems().stream().mapToDouble(value -> value.getUnitPrice() * value.getQuantity()).sum());
         beerRepository.save(beer);
         orderRepository.save(order);
         return modelMapper.fromOrderToOrderDto(order);
@@ -103,6 +108,7 @@ public class OrderService {
                 .startedTime(LocalDateTime.now())
                 .orderItems(new LinkedList<>())
                 .user(userRepository.findById(userId).orElseThrow(NullPointerException::new))
+                .totalPrice(0.00)
                 .build());
     }
 }
