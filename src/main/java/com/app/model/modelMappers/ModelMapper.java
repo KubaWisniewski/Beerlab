@@ -81,6 +81,7 @@ public class ModelMapper {
                 .orderItemsDto(order.getOrderItems() == null ? null : order.getOrderItems().stream().map(this::fromOrderItemToOrderItemDto).collect(Collectors.toList()))
                 .completeTime(order.getCompleteTime())
                 .startedTime(order.getStartedTime())
+                .totalPrice(order.getTotalPrice())
                 .build();
     }
 
@@ -93,6 +94,7 @@ public class ModelMapper {
                 .orderItems(orderDto.getOrderItemsDto() == null ? null : orderDto.getOrderItemsDto().stream().map(this::fromOrderItemDtoToOrderItem).collect(Collectors.toList()))
                 .completeTime(orderDto.getCompleteTime())
                 .startedTime(orderDto.getStartedTime())
+                .totalPrice(orderDto.getTotalPrice())
                 .build();
     }
 
