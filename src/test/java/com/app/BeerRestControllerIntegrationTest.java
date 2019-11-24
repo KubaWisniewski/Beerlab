@@ -102,7 +102,8 @@ public class BeerRestControllerIntegrationTest {
     @Test
     public void addBeerTest() throws Exception {
         Gson gsonBuilder = new GsonBuilder().create();
-        FileInputStream fis = new FileInputStream("D:/Programowanie/JAVA/workspace/Beerlab/src/main/resources/static/img/pic3.jpg");
+        ClassLoader classLoader = getClass().getClassLoader();
+        FileInputStream fis = new FileInputStream(classLoader.getResource("images/pic3.png").getFile());
         MockMultipartFile multipartFile = new MockMultipartFile("file", fis);
         BeerDto beerDto = BeerDto.builder().brand("Test").description("TestDesc").price(10.0).quantity(10).build();
         mvc.perform(MockMvcRequestBuilders.multipart("/api/beer")
@@ -116,8 +117,9 @@ public class BeerRestControllerIntegrationTest {
     @Test
     public void updateBeerTest() throws Exception {
         Gson gsonBuilder = new GsonBuilder().create();
+        ClassLoader classLoader = getClass().getClassLoader();
         BeerDto beerDto = beerRepository.findById(1L).map(modelMapper::fromBeerToBeerDto).orElseThrow(NullPointerException::new);
-        FileInputStream fis = new FileInputStream("D:/Programowanie/JAVA/workspace/Beerlab/src/main/resources/static/img/pic3.jpg");
+        FileInputStream fis = new FileInputStream(classLoader.getResource("images/pic3.png").getFile());
         MockMultipartFile multipartFile = new MockMultipartFile("file", fis);
         final String updateDesc = "UpdateDesc";
         beerDto.setDescription(updateDesc);
