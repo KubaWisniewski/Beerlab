@@ -1,8 +1,39 @@
-#language: java
-#jdk: oraclejdk8
-#branches:
-#  only:
-#    - /^master.*$/
-#script:
-#  - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
-#  - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$PR, BRANCH=$BRANCH"
+dist: xenial
+language: java
+jdk: openjdk8
+
+services:
+  - docker
+
+install: /bin/true
+
+branches:
+  only:
+    - /^master.*$/
+
+stages:
+  - name: Build-Application
+  - name: Test
+  - name: Build-Docker-Image
+
+before_install:
+  - docker build -t java-service .
+
+script:
+  - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
+  - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$PR, BRANCH=$BRANCH"
+
+jobs:
+  include:
+    - stage: Build-Application
+      script: 
+        - mvn compile
+
+    - stage: Test
+      script: 
+        - mvn test -B
+
+    - stage: Build-Docker-Image
+      script: 
+        - docker build -t beerlab-service .
+
