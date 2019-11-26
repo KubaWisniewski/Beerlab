@@ -66,7 +66,7 @@ public class OrderService {
     }
 
     public OrderDto getNotPaidUserOrder(Long id) {
-        return orderRepository.findByUserIdAndStatus(id, OrderStatus.NOT_PAID).map(modelMapper::fromOrderToOrderDto).orElseThrow(NullPointerException::new);
+        return orderRepository.findByUserIdAndStatus(id, OrderStatus.NOT_PAID).map(modelMapper::fromOrderToOrderDto).isPresent() ? orderRepository.findByUserIdAndStatus(id, OrderStatus.NOT_PAID).map(modelMapper::fromOrderToOrderDto).get() : createEmptyOrder(id);
     }
 
     public OrderDto order(Long id, AddBeerToOrderPayload addBeerToOrderPayload) {
@@ -105,14 +105,14 @@ public class OrderService {
         return modelMapper.fromOrderToOrderDto(order);
     }
 
-    private void createEmptyOrder(Long userId) {
-        orderRepository.save(Order
+    private OrderDto createEmptyOrder(Long userId) {
+        return modelMapper.fromOrderToOrderDto(orderRepository.save(Order
                 .builder()
                 .status(OrderStatus.NOT_PAID)
                 .startedTime(LocalDateTime.now())
                 .orderItems(new LinkedList<>())
                 .user(userRepository.findById(userId).orElseThrow(NullPointerException::new))
                 .totalPrice(0.00)
-                .build());
+                .build()));
     }
 }
