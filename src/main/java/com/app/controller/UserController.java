@@ -53,6 +53,15 @@ public class UserController {
         return orderService.getAllUserOrders(userDetails.getId());
     }
 
+    @ApiOperation(
+            value = "Confirm order",
+            response = OrderDto.class
+    )
+    @PostMapping("/confirm")
+    public OrderDto confirmOrder(@CurrentUser CustomUserDetails userDetails){
+        return orderService.confirmOrder(userDetails.getId());
+    }
+
     @GetMapping("/order")
     public OrderDto getNotPaidOrder(@ApiIgnore @CurrentUser CustomUserDetails userDetails) {
         return orderService.getNotPaidUserOrder(userDetails.getId());

@@ -1,22 +1,25 @@
 package com.app.service;
 
-import com.app.model.Beer;
-import com.app.model.Order;
-import com.app.model.OrderItem;
-import com.app.model.OrderStatus;
+import com.app.exception.NotEnoughBalanceException;
+import com.app.model.*;
+import com.app.model.dto.BeerDto;
 import com.app.model.dto.OrderDto;
+import com.app.model.dto.OrderItemDto;
 import com.app.model.modelMappers.ModelMapper;
 import com.app.payloads.requests.AddBeerToOrderPayload;
 import com.app.payloads.requests.ChangeOrderStatusPayload;
+import com.app.payloads.requests.ChangeQuantityPayload;
 import com.app.repository.BeerRepository;
 import com.app.repository.OrderRepository;
 import com.app.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import javax.management.BadAttributeValueExpException;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -69,6 +72,26 @@ public class OrderService {
         return orderRepository.findByUserIdAndStatus(id, OrderStatus.NOT_PAID).map(modelMapper::fromOrderToOrderDto).isPresent() ? orderRepository.findByUserIdAndStatus(id, OrderStatus.NOT_PAID).map(modelMapper::fromOrderToOrderDto).get() : createEmptyOrder(id);
     }
 
+    public OrderDto deleteBeerFromOrder(Long orderId, Long beerId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(NullPointerException::new);
+
+        OrderItem orderItem = order.getOrderItems().stream().filter(x -> x.getBeer().getId().equals(beerId)).findFirst().get();
+
+        Beer beer = beerRepository.findById(beerId).get();
+        beer.setQuantity(beer.getQuantity()+orderItem.getQuantity());
+
+        order.setOrderItems(order.getOrderItems().stream().filter(y -> !y.getBeer().getId().equals(beerId)).collect(Collectors.toList()));
+        order.setTotalPrice(order.getOrderItems().stream().mapToDouble(value -> value.getUnitPrice() * value.getQuantity()).sum());
+
+        orderItem.setOrder(null);
+
+        beerRepository.save(beer);
+        orderRepository.save(order);
+
+
+        return modelMapper.fromOrderToOrderDto(order);
+    }
+
     public OrderDto order(Long id, AddBeerToOrderPayload addBeerToOrderPayload) {
         if (beerRepository.findById(addBeerToOrderPayload.getBeerId()).get().getQuantity() == 0)
             throw new NullPointerException();
@@ -95,6 +118,42 @@ public class OrderService {
         return modelMapper.fromOrderToOrderDto(order);
     }
 
+    public OrderDto reduceQuantity(Long id, AddBeerToOrderPayload addBeerToOrderPayload){
+
+        Order order = orderRepository.findById(id).orElseThrow(NullPointerException::new);
+
+        OrderItem orderItem = order.getOrderItems().stream().filter(x -> x.getBeer().getId().equals(addBeerToOrderPayload.getBeerId())).findFirst().get();
+        orderItem.setQuantity(orderItem.getQuantity() - 1);
+
+        Beer beer = beerRepository.findById(addBeerToOrderPayload.getBeerId()).get();
+        beer.setQuantity(beer.getQuantity()+1);
+
+        order.setTotalPrice(order.getOrderItems().stream().mapToDouble(value -> value.getUnitPrice() * value.getQuantity()).sum());
+
+        beerRepository.save(beer);
+        orderRepository.save(order);
+
+
+        return modelMapper.fromOrderToOrderDto(order);
+    }
+
+    public OrderDto confirmOrder(Long id){
+        Order order = orderRepository.findByUserIdAndStatus(id,OrderStatus.NOT_PAID).orElseThrow(NullPointerException::new);
+        User user = userRepository.findById(id).orElseThrow(NullPointerException::new);
+
+        if(user.getBalance() < order.getTotalPrice()) {
+            throw new NotEnoughBalanceException();
+        }
+
+        user.setBalance(user.getBalance() - order.getTotalPrice());
+        order.setStatus(OrderStatus.valueOf("COMPLETED"));
+        order.setCompleteTime(LocalDateTime.now());
+
+        userRepository.save(user);
+        orderRepository.save(order);
+        return modelMapper.fromOrderToOrderDto(order);
+    }
+
     public OrderDto changeOrderStatus(Long id, ChangeOrderStatusPayload changeOrderStatusPayload) {
         Order order = orderRepository.findById(id).orElseThrow(NullPointerException::new);
         if (changeOrderStatusPayload.getOrderStatus().equals("COMPLETED")) {
@@ -115,4 +174,6 @@ public class OrderService {
                 .totalPrice(0.00)
                 .build()));
     }
+
+
 }

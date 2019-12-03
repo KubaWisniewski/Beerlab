@@ -32,6 +32,26 @@ public class OrderController {
     }
 
     @ApiOperation(
+            value = "Reduce orderItem quantity by 1",
+            response = OrderDto.class
+    )
+    @PostMapping("/reduce/{id}")
+    public OrderDto reduceOrderQuantity(@PathVariable Long id, @RequestBody AddBeerToOrderPayload addBeerToOrderPayload){
+        return orderService.reduceQuantity(id,addBeerToOrderPayload);
+    }
+
+    @ApiOperation(
+            value = "Delete beer from order",
+            response = OrderDto.class
+    )
+    @DeleteMapping("/{orderId}/delete/{beerId}")
+    public OrderDto deleteBeerFromOrder(@PathVariable Long orderId,@PathVariable Long beerId) {
+        return orderService.deleteBeerFromOrder(orderId, beerId);
+    }
+
+
+
+    @ApiOperation(
             value = "Fetch all orders",
             response = OrderDto.class
     )
