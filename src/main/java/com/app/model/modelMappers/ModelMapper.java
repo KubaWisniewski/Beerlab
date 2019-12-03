@@ -4,6 +4,7 @@ import com.app.model.*;
 import com.app.model.dto.*;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 @Component
@@ -137,6 +138,28 @@ public class ModelMapper {
                 .name(groupDto.getName())
                 .description(groupDto.getDescription())
                 .members(groupDto.getMembers() == null ? null : groupDto.getMembers().stream().map(this::fromUserDtoToUser).collect(Collectors.toList()))
+                .build();
+    }
+
+    public Report fromReportDtoToReport(ReportDto reportDto) {
+        return reportDto == null ? null : Report.builder()
+                .id(reportDto.getId())
+                .avgBeerPrice(reportDto.getAvgBeerPrice())
+                .start(reportDto.getStart())
+                .end(reportDto.getEnd())
+                .orders(reportDto.getOrders())
+                .users(reportDto.getUsers())
+                .build();
+    }
+
+    public ReportDto fromReportToReportDto(Report report) {
+        return report == null ? null : ReportDto.builder()
+                .id(report.getId())
+                .avgBeerPrice(report.getAvgBeerPrice())
+                .start(report.getStart())
+                .end(report.getEnd())
+                .orders(report.getOrders())
+                .users(report.getUsers())
                 .build();
     }
 }
