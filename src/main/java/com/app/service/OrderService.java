@@ -2,24 +2,18 @@ package com.app.service;
 
 import com.app.exception.NotEnoughBalanceException;
 import com.app.model.*;
-import com.app.model.dto.BeerDto;
 import com.app.model.dto.OrderDto;
-import com.app.model.dto.OrderItemDto;
 import com.app.model.modelMappers.ModelMapper;
 import com.app.payloads.requests.AddBeerToOrderPayload;
 import com.app.payloads.requests.ChangeOrderStatusPayload;
-import com.app.payloads.requests.ChangeQuantityPayload;
 import com.app.repository.BeerRepository;
 import com.app.repository.OrderRepository;
 import com.app.repository.UserRepository;
 import org.springframework.stereotype.Service;
-
-import javax.management.BadAttributeValueExpException;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -110,6 +104,7 @@ public class OrderService {
             return modelMapper.fromOrderToOrderDto(order);
         }
         Beer beer = beerRepository.findById(addBeerToOrderPayload.getBeerId()).get();
+        beer.setQuantity(beer.getQuantity() - addBeerToOrderPayload.getQuantity());
         OrderItem orderItem = OrderItem.builder().quantity(addBeerToOrderPayload.getQuantity()).unitPrice(beer.getPrice()).beer(beer).order(order).build();
         order.getOrderItems().add(orderItem);
         order.setTotalPrice(order.getOrderItems().stream().mapToDouble(value -> value.getUnitPrice() * value.getQuantity()).sum());
@@ -174,6 +169,4 @@ public class OrderService {
                 .totalPrice(0.00)
                 .build()));
     }
-
-
 }

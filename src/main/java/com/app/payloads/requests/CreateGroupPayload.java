@@ -5,16 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddOrDeleteUserGroupPayload {
-    @NotBlank
-    private String email;
-
-    @NotBlank
-    private Long groupId;
+public class CreateGroupPayload {
+    private String name;
+    private String description;
 }

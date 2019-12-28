@@ -54,6 +54,25 @@ public class ModelMapper {
                 .build();
     }
 
+    public MessageDto fromMessageToMessageDto(Message message) {
+        return message ==
+                null ? null : MessageDto.builder()
+                .id(message.getId())
+                .text(message.getText())
+                .time(message.getTime())
+                .userEmail(message.getUser() == null ? "" : message.getUser().getEmail())
+                .build();
+    }
+
+    public Message fromMessageDtoToMessage(MessageDto messageDto) {
+        return messageDto ==
+                null ? null : Message.builder()
+                .id(messageDto.getId())
+                .text(messageDto.getText())
+                .time(messageDto.getTime())
+                .build();
+    }
+
     public OrderItemDto fromOrderItemToOrderItemDto(OrderItem orderItem) {
         return orderItem ==
                 null ? null : OrderItemDto.builder()
@@ -127,7 +146,6 @@ public class ModelMapper {
         return group == null ? null : GroupDto.builder()
                 .id(group.getId())
                 .name(group.getName())
-                .members(group.getMembers() == null ? null : group.getMembers().stream().map(this::fromUserToUserDto).collect(Collectors.toList()))
                 .description(group.getDescription())
                 .build();
     }
@@ -137,7 +155,6 @@ public class ModelMapper {
                 .id(groupDto.getId())
                 .name(groupDto.getName())
                 .description(groupDto.getDescription())
-                .members(groupDto.getMembers() == null ? null : groupDto.getMembers().stream().map(this::fromUserDtoToUser).collect(Collectors.toList()))
                 .build();
     }
 

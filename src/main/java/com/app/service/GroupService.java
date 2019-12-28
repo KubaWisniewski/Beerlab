@@ -4,10 +4,14 @@ import com.app.model.Group;
 import com.app.model.User;
 import com.app.model.dto.GroupDto;
 import com.app.model.modelMappers.ModelMapper;
+import com.app.payloads.requests.CreateGroupPayload;
 import com.app.repository.GroupRepository;
 import com.app.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,9 +27,9 @@ public class GroupService {
         this.userRepository = userRepository;
     }
 
-    public List<GroupDto> getGroups() {
+    public List<GroupDto> getGroupsByUser(Long userId) {
         return groupRepository
-                .findAll()
+                .findGroupsByUsersContains(userRepository.findById(userId).get())
                 .stream()
                 .map(modelMapper::fromGroupToGroupDto)
                 .collect(Collectors.toList());
@@ -38,11 +42,14 @@ public class GroupService {
                 .orElseThrow(NullPointerException::new);
     }
 
-    public GroupDto addOrUpdateGroup(GroupDto groupDto) {
-        if (groupDto == null)
+    public GroupDto createGroup(Long userId, CreateGroupPayload createGroupPayload) {
+        if (createGroupPayload == null)
             throw new NullPointerException("Group is null");
-        Group group = modelMapper.fromGroupDtoToGroup(groupDto);
+        User user = userRepository.findById(userId).orElseThrow(NullPointerException::new);
+        Group group = Group.builder().name(createGroupPayload.getName()).description(createGroupPayload.getDescription()).users(new ArrayList<>(Collections.singletonList(user))).build();
+        user.getGroups().add(group);
         groupRepository.save(group);
+        userRepository.save(user);
         return modelMapper.fromGroupToGroupDto(group);
     }
 
@@ -52,27 +59,27 @@ public class GroupService {
         return modelMapper.fromGroupToGroupDto(group);
     }
 
-    public GroupDto addUserToGroup(String email, String groupName) {
-        if (email == null && groupName == null) {
+    public GroupDto addUserToGroup(String email, Long groupId) {
+        if (email == null && groupId == null) {
             throw new NullPointerException("User email and group null");
         }
-        Group group = groupRepository.findByName(groupName);
+        Group group = groupRepository.findById(groupId).orElseThrow(NullPointerException::new);
         User userToAdd = userRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("User not exist"));
-        group.getMembers().add(userToAdd);
-        userToAdd.setGroup(group);
+        group.getUsers().add(userToAdd);
+        userToAdd.getGroups().add(group);
         userRepository.save(userToAdd);
         groupRepository.save(group);
         return modelMapper.fromGroupToGroupDto(group);
     }
 
-    public GroupDto deleteUserFromGroup(String email, String groupName) {
-        if (email == null && groupName == null) {
+    public GroupDto deleteUserFromGroup(String email, Long groupId) {
+        if (email == null && groupId == null) {
             throw new NullPointerException("User email and group null");
         }
-        Group group = groupRepository.findByName(groupName);
+        Group group = groupRepository.findById(groupId).orElseThrow(NullPointerException::new);
         User user = userRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("User not exist"));
-        user.setGroup(null);
-        group.getMembers().remove(user);
+        user.getGroups().remove(group);
+        group.getUsers().remove(user);
         groupRepository.save(group);
         userRepository.save(user);
         return modelMapper.fromGroupToGroupDto(group);

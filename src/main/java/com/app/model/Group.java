@@ -20,9 +20,10 @@ public class Group {
     private Long id;
     private String name;
     private String description;
-
-    @OneToMany(mappedBy = "group", fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
-    private List<User> members = new LinkedList<>();
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, fetch = FetchType.EAGER, mappedBy = "groups")
+    private List<User> users = new LinkedList<>();
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
+    private List<Message> messages = new LinkedList<>();
 
     @Override
     public boolean equals(Object o) {
