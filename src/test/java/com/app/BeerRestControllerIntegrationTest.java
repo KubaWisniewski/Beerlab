@@ -10,7 +10,7 @@ import com.app.payloads.requests.LoginPayload;
 import com.app.repository.BeerRepository;
 import com.app.repository.RoleRepository;
 import com.app.repository.UserRepository;
-import com.app.utils.FileManager;
+import com.app.service.AmazonClient;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.Assert;
@@ -56,7 +56,7 @@ public class BeerRestControllerIntegrationTest {
     @Autowired
     private UserRepository userRepository;
     @MockBean
-    private FileManager fileManager;
+    private AmazonClient amazonClient;
 
     @Before
     public void init() {
@@ -106,6 +106,7 @@ public class BeerRestControllerIntegrationTest {
         FileInputStream fis = new FileInputStream(classLoader.getResource("images/pic3.png").getFile());
         MockMultipartFile multipartFile = new MockMultipartFile("file", fis);
         BeerDto beerDto = BeerDto.builder().brand("Test").description("TestDesc").price(10.0).quantity(10).build();
+        when(amazonClient.uploadFile(multipartFile)).thenReturn(null);
         mvc.perform(MockMvcRequestBuilders.multipart("/api/beer")
                 .file("file", multipartFile.getBytes())
                 .param("beerDto", gsonBuilder.toJson(beerDto))
@@ -121,6 +122,7 @@ public class BeerRestControllerIntegrationTest {
         BeerDto beerDto = beerRepository.findById(1L).map(modelMapper::fromBeerToBeerDto).orElseThrow(NullPointerException::new);
         FileInputStream fis = new FileInputStream(classLoader.getResource("images/pic3.png").getFile());
         MockMultipartFile multipartFile = new MockMultipartFile("file", fis);
+        when(amazonClient.uploadFile(multipartFile)).thenReturn(null);
         final String updateDesc = "UpdateDesc";
         beerDto.setDescription(updateDesc);
         mvc.perform(MockMvcRequestBuilders.multipart("/api/beer")
@@ -137,7 +139,6 @@ public class BeerRestControllerIntegrationTest {
         Gson gsonBuilder = new GsonBuilder().create();
         final int countBefore = beerRepository.findAll().size();
         BeerDto beerDto = beerRepository.findById(2L).map(modelMapper::fromBeerToBeerDto).orElseThrow(NullPointerException::new);
-        when(fileManager.removeFile("test.jpg")).thenReturn("");
         mvc.perform(delete("/api/beer/2")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-Auth-Token", getAuthToken())

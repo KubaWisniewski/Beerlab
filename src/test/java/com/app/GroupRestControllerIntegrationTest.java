@@ -23,9 +23,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -58,10 +58,10 @@ public class GroupRestControllerIntegrationTest {
                     .forEach(role -> roleRepository.save(Role.builder().roleName(role).build()));
         }
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        User user = User.builder().email("test@test.com").username("test").roles(Collections.singletonList(roleRepository.findByRoleName(RoleName.ROLE_USER).get())).password(bCryptPasswordEncoder.encode("123")).balance(100.0).build();
+        User user = User.builder().email("test@test.com").username("test").groups(new LinkedList<>()).roles(Collections.singletonList(roleRepository.findByRoleName(RoleName.ROLE_USER).get())).password(bCryptPasswordEncoder.encode("123")).balance(100.0).build();
         beerRepository.save(Beer.builder().brand("Aaa").description("Adesc").quantity(10).price(10.0).build());
-        Group group = Group.builder().name("TestGroup").description("Test description").members(Collections.singletonList(user)).build();
-        user.setGroup(group);
+        Group group = Group.builder().name("TestGroup").description("Test description").users(new LinkedList<>()).build();
+        user.getGroups().add(group);
         groupRepository.save(group);
         userRepository.save(user);
     }
@@ -119,23 +119,6 @@ public class GroupRestControllerIntegrationTest {
     }
 
     @Test
-    public void updateGroupTest() throws Exception {
-        Gson gsonBuilder = new GsonBuilder().create();
-        final String updateDesc = "UpdateDesc";
-        GroupDto groupDto = groupRepository.findById(1L).map(modelMapper::fromGroupToGroupDto).orElseThrow(NullPointerException::new);
-        groupDto.setDescription(updateDesc);
-        mvc.perform(put("/api/group")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("X-Auth-Token", getAuthToken())
-                .header("Accept", "application/json")
-                .content(gsonBuilder.toJson(groupDto)))
-                .andExpect(status().isOk())
-                .andExpect(content().json(gsonBuilder.toJson(groupDto)));
-        Assert.assertEquals(1, groupRepository.findAll().size());
-        Assert.assertEquals(updateDesc, groupRepository.findById(1L).get().getDescription());
-    }
-
-    @Test
     public void addUserToGroupTest() throws Exception {
         Gson gsonBuilder = new GsonBuilder().create();
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
@@ -144,21 +127,21 @@ public class GroupRestControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-Auth-Token", getAuthToken())
                 .header("Accept", "application/json")
-                .content(gsonBuilder.toJson(AddOrDeleteUserGroupPayload.builder().email("add@test.com").groupName("TestGroup").build())))
+                .content(gsonBuilder.toJson(AddOrDeleteUserGroupPayload.builder().email("add@test.com").groupId(1L).build())))
                 .andExpect(status().isOk());
-        Assert.assertEquals(2, groupRepository.findById(1L).get().getMembers().size());
+        Assert.assertEquals(2, groupRepository.findById(1L).get().getUsers().size());
     }
 
     @Test
-    public void deleteUserToGroupTest() throws Exception {
+    public void deleteUserFromGroupTest() throws Exception {
         Gson gsonBuilder = new GsonBuilder().create();
         mvc.perform(delete("/api/group/deleteUser")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-Auth-Token", getAuthToken())
                 .header("Accept", "application/json")
-                .content(gsonBuilder.toJson(AddOrDeleteUserGroupPayload.builder().email("test@test.com").groupName("TestGroup").build())))
+                .content(gsonBuilder.toJson(AddOrDeleteUserGroupPayload.builder().email("test@test.com").groupId(1L).build())))
                 .andExpect(status().isOk());
-        Assert.assertEquals(0, groupRepository.findById(1L).get().getMembers().size());
+        Assert.assertEquals(0, groupRepository.findById(1L).get().getUsers().size());
     }
 
     private String getAuthToken() throws Exception {
@@ -172,4 +155,3 @@ public class GroupRestControllerIntegrationTest {
                 .getHeader("x-auth-token");
     }
 }
-
