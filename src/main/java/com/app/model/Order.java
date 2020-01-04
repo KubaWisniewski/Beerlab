@@ -37,6 +37,7 @@ public class Order {
     @DateTimeFormat(pattern = "yyyy-MM-ddTHH:mm:ss")
     private LocalDateTime completeTime;
     private Double totalPrice;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -49,5 +50,4 @@ public class Order {
     public int hashCode() {
         return Objects.hash(id);
     }
-
 }

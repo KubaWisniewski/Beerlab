@@ -3,6 +3,7 @@ package com.app.controller;
 import com.app.model.dto.ReportDto;
 import com.app.repository.ReportRepository;
 import com.app.service.StatisticService;
+import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/statistic")
+@Api(tags = "Statistic controller")
 public class StatisticController {
 
     private StatisticService statisticService;

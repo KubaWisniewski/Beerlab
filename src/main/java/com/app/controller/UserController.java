@@ -7,6 +7,7 @@ import com.app.security.CurrentUser;
 import com.app.security.CustomUserDetails;
 import com.app.service.OrderService;
 import com.app.service.UserService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
+@Api(tags = "User controller")
 public class UserController {
     private UserService userService;
     private OrderService orderService;

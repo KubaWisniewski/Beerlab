@@ -9,28 +9,30 @@ import javax.persistence.*;
 import java.util.*;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
-public class Beer {
+public class UserQuiz {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id;
-    private String description;
-    private String imgUrl;
-    private String brand;
-    private Double price;
-    private Integer quantity;
-    @OneToMany(mappedBy = "order", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private List<OrderItem> orderItems = new LinkedList<>();
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+    @ManyToOne
+    @JoinColumn(name = "quiz_id")
+    private Quiz quiz;
+    @OneToMany(mappedBy = "userQuiz", cascade = CascadeType.ALL)
+    private List<UserAnswer> userAnswers = new ArrayList<>();
+    private Integer score = 0;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Beer beer = (Beer) o;
-        return Objects.equals(id, beer.id);
+        UserQuiz userQuiz = (UserQuiz) o;
+        return Objects.equals(id, userQuiz.id);
     }
 
     @Override
