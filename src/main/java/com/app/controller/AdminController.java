@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
-@Api(value = "Admin REST API")
+@Api(tags = "Admin controller")
 public class AdminController {
     private AdminService adminService;
 

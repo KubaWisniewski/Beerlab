@@ -10,6 +10,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -21,7 +22,7 @@ import static javax.persistence.EnumType.STRING;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User implements Serializable {
+public class    User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -66,6 +67,9 @@ public class User implements Serializable {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateOfBirth;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<UserQuiz> userQuizzes = new ArrayList<>();
+
     public User(User user) {
         id = user.getId();
         username = user.getUsername();
@@ -90,5 +94,4 @@ public class User implements Serializable {
     public int hashCode() {
         return Objects.hash(id);
     }
-
 }

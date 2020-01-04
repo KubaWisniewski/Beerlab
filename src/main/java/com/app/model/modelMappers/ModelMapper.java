@@ -179,4 +179,103 @@ public class ModelMapper {
                 .users(report.getUsers())
                 .build();
     }
+
+    public QuizDto fromQuizToQuizDto(Quiz quiz) {
+        return quiz == null ? null : QuizDto.builder()
+                .id(quiz.getId())
+                .name(quiz.getName())
+                .description(quiz.getDescription())
+                .startDate(quiz.getStartDate())
+                .endDate(quiz.getEndDate())
+                .imgUrl(quiz.getImgUrl())
+                .isActive(quiz.isActive())
+                .questionDtoList(quiz.getQuestions() == null ? null : quiz.getQuestions().stream().map(this::fromQuestionToQuestionDto).collect(Collectors.toList()))
+                .build();
+    }
+
+    public Quiz fromQuizDtoToQuiz(QuizDto quizDto) {
+        return quizDto == null ? null : Quiz.builder()
+                .id(quizDto.getId())
+                .name(quizDto.getName())
+                .description(quizDto.getDescription())
+                .startDate(quizDto.getStartDate())
+                .endDate(quizDto.getEndDate())
+                .imgUrl(quizDto.getImgUrl())
+                .isActive(quizDto.isActive())
+                .questions(quizDto.getQuestionDtoList() == null ? null : quizDto.getQuestionDtoList().stream().map(this::fromQuestionDtoToQuestion).collect(Collectors.toList()))
+                .build();
+    }
+
+    public QuestionDto fromQuestionToQuestionDto(Question question) {
+        return question == null ? null : QuestionDto.builder()
+                .id(question.getId())
+                .text(question.getText())
+                .imgUrl(question.getImgUrl())
+                .answerDtoList(question.getAnswers() == null ? null : question.getAnswers().stream().map(this::fromAnswerToAnswerDto).collect(Collectors.toList()))
+                .build();
+    }
+
+    public Question fromQuestionDtoToQuestion(QuestionDto questionDto) {
+        return questionDto == null ? null : Question.builder()
+                .id(questionDto.getId())
+                .text(questionDto.getText())
+                .imgUrl(questionDto.getImgUrl())
+                .answers(questionDto.getAnswerDtoList() == null ? null : questionDto.getAnswerDtoList().stream().map(this::fromAnswerDtoToAnswer).collect(Collectors.toList()))
+                .build();
+    }
+
+    public Answer fromAnswerDtoToAnswer(AnswerDto answerDto) {
+        return answerDto == null ? null : Answer.builder()
+                .id(answerDto.getId())
+                .text(answerDto.getText())
+                .isCorrect(answerDto.isCorrect())
+                .imgUrl(answerDto.getImgUrl())
+                .build();
+    }
+
+    public AnswerDto fromAnswerToAnswerDto(Answer answer) {
+        return answer == null ? null : AnswerDto.builder()
+                .id(answer.getId())
+                .text(answer.getText())
+                .isCorrect(answer.isCorrect())
+                .imgUrl(answer.getImgUrl())
+                .build();
+    }
+
+    public UserQuizDto fromUserQuizToUserQuizDto(UserQuiz userQuiz) {
+        return userQuiz == null ? null : UserQuizDto.builder()
+                .id(userQuiz.getId())
+                .score(userQuiz.getScore())
+                .quizDto(userQuiz.getQuiz() == null ? null : fromQuizToQuizDto(userQuiz.getQuiz()))
+                .build();
+    }
+
+
+    public UserQuiz fromUserQuizDtoToUserQuiz(UserQuizDto userQuizDto) {
+        return userQuizDto == null ? null : UserQuiz.builder()
+                .id(userQuizDto.getId())
+                .score(userQuizDto.getScore())
+                .user(userQuizDto.getUserDto() == null ? null : fromUserDtoToUser(userQuizDto.getUserDto()))
+                .quiz(userQuizDto.getQuizDto() == null ? null : fromQuizDtoToQuiz(userQuizDto.getQuizDto()))
+                .userAnswers(userQuizDto.getUserAnswerDtos() == null ? null : userQuizDto.getUserAnswerDtos().stream().map(this::formUserAnswerDtoToUserAnswer).collect(Collectors.toList()))
+                .build();
+    }
+
+    public UserAnswerDto formUserAnswerToUserAnswerDto(UserAnswer userAnswer) {
+        return userAnswer == null ? null : UserAnswerDto.builder()
+                .id(userAnswer.getId())
+                .questionDto(userAnswer.getQuestion() == null ? null : fromQuestionToQuestionDto(userAnswer.getQuestion()))
+                .answerDto(userAnswer.getAnswer() == null ? null : fromAnswerToAnswerDto(userAnswer.getAnswer()))
+                .userQuizDto(userAnswer.getUserQuiz() == null ? null : fromUserQuizToUserQuizDto(userAnswer.getUserQuiz()))
+                .build();
+    }
+
+    public UserAnswer formUserAnswerDtoToUserAnswer(UserAnswerDto userAnswerDto) {
+        return userAnswerDto == null ? null : UserAnswer.builder()
+                .id(userAnswerDto.getId())
+                .question(userAnswerDto.getQuestionDto() == null ? null : fromQuestionDtoToQuestion(userAnswerDto.getQuestionDto()))
+                .answer(userAnswerDto.getAnswerDto() == null ? null : fromAnswerDtoToAnswer(userAnswerDto.getAnswerDto()))
+                .userQuiz(userAnswerDto.getUserQuizDto() == null ? null : fromUserQuizDtoToUserQuiz(userAnswerDto.getUserQuizDto()))
+                .build();
+    }
 }
