@@ -48,11 +48,20 @@ public class UserController {
 
     @ApiOperation(
             value = "Get user orders",
-            response = Double.class
+            response = OrderDto.class
     )
     @GetMapping("/orders")
     public List<OrderDto> getUserOrders(@ApiIgnore @CurrentUser CustomUserDetails userDetails) {
         return orderService.getAllUserOrders(userDetails.getId());
+    }
+
+    @ApiOperation(
+            value = "Get user completed orders",
+            response = OrderDto.class
+    )
+    @GetMapping("/completedOrders")
+    public List<OrderDto> getUserCompletedOrders(@ApiIgnore @CurrentUser CustomUserDetails userDetails) {
+        return orderService.getUserCompletedOrders(userDetails.getId());
     }
 
     @ApiOperation(
