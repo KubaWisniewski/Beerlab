@@ -10,6 +10,7 @@ import com.app.repository.BeerRepository;
 import com.app.repository.OrderRepository;
 import com.app.repository.UserRepository;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -37,7 +38,7 @@ public class OrderService {
     }
 
     public List<OrderDto> getQueueOrders() {
-        return orderRepository.findAll().stream().filter(order -> order.getStatus() != OrderStatus.CLOSED && order.getStatus() != OrderStatus.COMPLETED).sorted(Comparator.comparing(order -> order.getStartedTime())).map(modelMapper::fromOrderToOrderDto).collect(Collectors.toList());
+        return orderRepository.findAll().stream().filter(order -> order.getStatus() != OrderStatus.CLOSED && order.getStatus() != OrderStatus.NOT_PAID && order.getStatus() != OrderStatus.PAID).sorted(Comparator.comparing(order -> order.getStartedTime())).map(modelMapper::fromOrderToOrderDto).collect(Collectors.toList());
     }
 
     public List<OrderDto> getAllUserOrders(Long id) {
@@ -49,7 +50,7 @@ public class OrderService {
         Order order = orderRepository.findById(orderId).orElseThrow(NullPointerException::new);
         int counter = 0;
         for (OrderDto o : allOrdersInQueue) {
-            if (o.getId() != order.getId()) {
+            if (!o.getId().equals(order.getId())) {
                 counter += 1;
             } else {
                 return counter;
