@@ -72,7 +72,7 @@ public class OrderService {
         OrderItem orderItem = order.getOrderItems().stream().filter(x -> x.getBeer().getId().equals(beerId)).findFirst().get();
 
         Beer beer = beerRepository.findById(beerId).get();
-        beer.setQuantity(beer.getQuantity()+orderItem.getQuantity());
+        beer.setQuantity(beer.getQuantity() + orderItem.getQuantity());
 
         order.setOrderItems(order.getOrderItems().stream().filter(y -> !y.getBeer().getId().equals(beerId)).collect(Collectors.toList()));
         order.setTotalPrice(order.getOrderItems().stream().mapToDouble(value -> value.getUnitPrice() * value.getQuantity()).sum());
@@ -113,7 +113,7 @@ public class OrderService {
         return modelMapper.fromOrderToOrderDto(order);
     }
 
-    public OrderDto reduceQuantity(Long id, AddBeerToOrderPayload addBeerToOrderPayload){
+    public OrderDto reduceQuantity(Long id, AddBeerToOrderPayload addBeerToOrderPayload) {
 
         Order order = orderRepository.findById(id).orElseThrow(NullPointerException::new);
 
@@ -121,7 +121,7 @@ public class OrderService {
         orderItem.setQuantity(orderItem.getQuantity() - 1);
 
         Beer beer = beerRepository.findById(addBeerToOrderPayload.getBeerId()).get();
-        beer.setQuantity(beer.getQuantity()+1);
+        beer.setQuantity(beer.getQuantity() + 1);
 
         order.setTotalPrice(order.getOrderItems().stream().mapToDouble(value -> value.getUnitPrice() * value.getQuantity()).sum());
 
@@ -132,26 +132,30 @@ public class OrderService {
         return modelMapper.fromOrderToOrderDto(order);
     }
 
-    public OrderDto confirmOrder(Long id){
-        Order order = orderRepository.findByUserIdAndStatus(id,OrderStatus.NOT_PAID).orElseThrow(NullPointerException::new);
+    public OrderDto confirmOrder(Long id) {
+        Order order = orderRepository.findByUserIdAndStatus(id, OrderStatus.NOT_PAID).orElseThrow(NullPointerException::new);
         User user = userRepository.findById(id).orElseThrow(NullPointerException::new);
 
-        if(user.getBalance() < order.getTotalPrice()) {
+        if (user.getBalance() < order.getTotalPrice()) {
             throw new NotEnoughBalanceException();
         }
 
         user.setBalance(user.getBalance() - order.getTotalPrice());
-        order.setStatus(OrderStatus.valueOf("COMPLETED"));
-        order.setCompleteTime(LocalDateTime.now());
+        order.setStatus(OrderStatus.QUEUED);
+        order.setStartedTime(LocalDateTime.now());
 
         userRepository.save(user);
         orderRepository.save(order);
         return modelMapper.fromOrderToOrderDto(order);
     }
 
+    public List<OrderDto> getUserCompletedOrders(Long userId) {
+        return orderRepository.findAllByUserIdAndStatus(userId, OrderStatus.COMPLETED).stream().map(modelMapper::fromOrderToOrderDto).collect(Collectors.toList());
+    }
+
     public OrderDto changeOrderStatus(Long id, ChangeOrderStatusPayload changeOrderStatusPayload) {
         Order order = orderRepository.findById(id).orElseThrow(NullPointerException::new);
-        if (changeOrderStatusPayload.getOrderStatus().equals("COMPLETED")) {
+        if (changeOrderStatusPayload.getOrderStatus().equals(OrderStatus.COMPLETED.toString())) {
             order.setCompleteTime(LocalDateTime.now());
         }
         order.setStatus(OrderStatus.valueOf(changeOrderStatusPayload.getOrderStatus()));
@@ -163,7 +167,6 @@ public class OrderService {
         return modelMapper.fromOrderToOrderDto(orderRepository.save(Order
                 .builder()
                 .status(OrderStatus.NOT_PAID)
-                .startedTime(LocalDateTime.now())
                 .orderItems(new LinkedList<>())
                 .user(userRepository.findById(userId).orElseThrow(NullPointerException::new))
                 .totalPrice(0.00)
