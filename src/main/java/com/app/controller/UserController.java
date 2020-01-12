@@ -68,19 +68,47 @@ public class UserController {
             value = "Confirm order",
             response = OrderDto.class
     )
-    @PostMapping("/confirm")
-    public OrderDto confirmOrder(@CurrentUser CustomUserDetails userDetails){
-        return orderService.confirmOrder(userDetails.getId());
+    @PostMapping("/confirm/{method}")
+    public OrderDto confirmOrder(@CurrentUser CustomUserDetails userDetails, @PathVariable Long method) {
+        return orderService.confirmOrder(userDetails.getId(), method);
     }
 
+    @ApiOperation(
+            value = "Get not paid user order",
+            response = OrderDto.class
+    )
     @GetMapping("/order")
     public OrderDto getNotPaidOrder(@ApiIgnore @CurrentUser CustomUserDetails userDetails) {
         return orderService.getNotPaidUserOrder(userDetails.getId());
     }
 
+    @ApiOperation(
+            value = "Add money for user",
+            response = ResponseEntity.class
+    )
     @PostMapping("/addMoney")
     public ResponseEntity addBalanceForUser(@ApiIgnore @CurrentUser CustomUserDetails userDetails, @RequestBody PayPalPayload payPalPayload) {
         userService.addBalanceForUser(userDetails.getId(), payPalPayload);
+        return ResponseEntity.ok().body("OK");
+    }
+
+    @ApiOperation(
+            value = "Set username",
+            response = ResponseEntity.class
+    )
+    @PostMapping("/setUsername")
+    public ResponseEntity setUsername(@ApiIgnore @CurrentUser CustomUserDetails userDetails, @RequestBody String newUsername) {
+        userService.setUsername(userDetails.getId(), newUsername);
+        return ResponseEntity.ok().body("OK");
+    }
+
+    @ApiOperation(
+            value = "Set password",
+            response = ResponseEntity.class
+    )
+    @PostMapping("/setPassword")
+    public ResponseEntity setPassword(@ApiIgnore @CurrentUser CustomUserDetails userDetails, @RequestBody String newPassword) {
+        userService.setPassword(userDetails.getId(), newPassword);
         return ResponseEntity.ok().body("OK");
     }
 }

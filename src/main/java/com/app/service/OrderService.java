@@ -34,11 +34,11 @@ public class OrderService {
     }
 
     public List<OrderDto> getAllOrders() {
-        return orderRepository.findAll().stream().sorted(Comparator.comparing(Order::getStartedTime)).map(modelMapper::fromOrderToOrderDto).collect(Collectors.toList());
+        return orderRepository.findAll().stream().map(modelMapper::fromOrderToOrderDto).collect(Collectors.toList());
     }
 
     public List<OrderDto> getQueueOrders() {
-        return orderRepository.findAll().stream().filter(order -> order.getStatus() != OrderStatus.CLOSED && order.getStatus() != OrderStatus.NOT_PAID && order.getStatus() != OrderStatus.PAID).sorted(Comparator.comparing(order -> order.getStartedTime())).map(modelMapper::fromOrderToOrderDto).collect(Collectors.toList());
+        return orderRepository.findAll().stream().filter(order -> order.getStatus() != OrderStatus.CLOSED && order.getStatus() != OrderStatus.NOT_PAID).sorted(Comparator.comparing(Order::getStartedTime)).map(modelMapper::fromOrderToOrderDto).collect(Collectors.toList());
     }
 
     public List<OrderDto> getAllUserOrders(Long id) {
@@ -133,19 +133,22 @@ public class OrderService {
         return modelMapper.fromOrderToOrderDto(order);
     }
 
-    public OrderDto confirmOrder(Long id) {
+    public OrderDto confirmOrder(Long id, Long method) {
         Order order = orderRepository.findByUserIdAndStatus(id, OrderStatus.NOT_PAID).orElseThrow(NullPointerException::new);
-        User user = userRepository.findById(id).orElseThrow(NullPointerException::new);
+        if (method == 1L) {
+            User user = userRepository.findById(id).orElseThrow(NullPointerException::new);
 
-        if (user.getBalance() < order.getTotalPrice()) {
-            throw new NotEnoughBalanceException();
+            if (user.getBalance() < order.getTotalPrice()) {
+                throw new NotEnoughBalanceException();
+            }
+            user.setBalance(user.getBalance() - order.getTotalPrice());
+            order.setStatus(OrderStatus.QUEUED);
+            userRepository.save(user);
+        } else if (method == 2L) {
+            order.setStatus(OrderStatus.CASH_PAID);
         }
-
-        user.setBalance(user.getBalance() - order.getTotalPrice());
-        order.setStatus(OrderStatus.QUEUED);
         order.setStartedTime(LocalDateTime.now());
 
-        userRepository.save(user);
         orderRepository.save(order);
         return modelMapper.fromOrderToOrderDto(order);
     }
