@@ -47,6 +47,18 @@ public class UserService {
         return userRepository.findById(id).map(modelMapper::fromUserToUserDto).orElseThrow(NullPointerException::new);
     }
 
+    public UserDto setUsername(Long id, String newUsername) {
+        User user = userRepository.findById(id).orElseThrow(NullPointerException::new);
+        user.setUsername(newUsername);
+        return modelMapper.fromUserToUserDto(userRepository.save(user));
+    }
+
+    public UserDto setPassword(Long id, String newPassword) {
+        User user = userRepository.findById(id).orElseThrow(NullPointerException::new);
+        user.setPassword(passwordEncoder.encode(newPassword));
+        return modelMapper.fromUserToUserDto(userRepository.save(user));
+    }
+
     private Boolean checkEmailExists(String email) {
         return userRepository.existsUserByEmail(email).orElseThrow(UserRegisterException::new);
     }
