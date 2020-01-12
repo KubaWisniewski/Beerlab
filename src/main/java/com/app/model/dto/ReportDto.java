@@ -1,5 +1,6 @@
 package com.app.model.dto;
 
+import com.app.model.Beer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,6 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 @Data
@@ -22,5 +24,9 @@ public class ReportDto {
     private LocalDateTime end;
     private int users;
     private int orders;
+    private Double startBeersValue;
     private List<Double> avgBeerPrice = new ArrayList<>();
+    private Double potentialIncome;
+    private List<Beer> beers = new LinkedList<>();
+    private List<String> mostPopularBeers = new LinkedList<>();
 }

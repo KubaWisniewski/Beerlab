@@ -127,6 +127,7 @@ public class ModelMapper {
                 .imgUrl(beer.getImgUrl())
                 .price(beer.getPrice())
                 .quantity(beer.getQuantity())
+                .minimalPrice(beer.getMinimalPrice())
                 .build();
     }
 
@@ -139,6 +140,7 @@ public class ModelMapper {
                 .imgUrl(beerDto.getImgUrl())
                 .price(beerDto.getPrice())
                 .quantity(beerDto.getQuantity())
+                .minimalPrice(beerDto.getMinimalPrice())
                 .build();
     }
 
@@ -166,6 +168,9 @@ public class ModelMapper {
                 .end(reportDto.getEnd())
                 .orders(reportDto.getOrders())
                 .users(reportDto.getUsers())
+                .startBeersValue(reportDto.getStartBeersValue())
+                .potentialIncome(reportDto.getPotentialIncome())
+                .mostPopularBeers(reportDto.getMostPopularBeers())
                 .build();
     }
 
@@ -177,6 +182,9 @@ public class ModelMapper {
                 .end(report.getEnd())
                 .orders(report.getOrders())
                 .users(report.getUsers())
+                .startBeersValue(report.getStartBeersValue())
+                .potentialIncome(report.getPotentialIncome())
+                .mostPopularBeers(report.getMostPopularBeers())
                 .build();
     }
 

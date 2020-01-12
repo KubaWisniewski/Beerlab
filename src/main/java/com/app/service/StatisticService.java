@@ -3,6 +3,8 @@ package com.app.service;
 import com.app.model.Beer;
 import com.app.model.Order;
 import com.app.model.Report;
+import com.app.model.User;
+import com.app.model.dto.BeerDto;
 import com.app.model.dto.ReportDto;
 import com.app.model.modelMappers.ModelMapper;
 import com.app.repository.BeerRepository;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -48,21 +51,44 @@ public class StatisticService {
     }
 
     public ReportDto createNewReport() {
+
         Report report = reportRepository.findAll().stream().filter(report1 -> report1.getEnd() == null).findFirst().orElse(new Report());
         report = updateReportData(report);
-        report.setEnd(LocalDateTime.now());
-        reportRepository.saveAndFlush(report);
+        if(report.getStartBeersValue() == null){
+            reportRepository.delete(report);
+        }
+        else {
+            report.setPotentialIncome(calculatePotentialIncome(report));
+            report.setEnd(LocalDateTime.now());
+            reportRepository.saveAndFlush(report);
+        }
+
         reportRepository.save(new Report());
         Report newReport = reportRepository.findAll().stream().filter(report1 -> report1.getEnd() == null).findFirst().orElseThrow(NullPointerException::new);
-        updateReportData(newReport);
+               newReport.setStart(LocalDateTime.now());
+               newReport.setStartBeersValue(calculateBeersValue());
+
         updateReportData(newReport);
         return modelMapper.fromReportToReportDto(newReport);
     }
 
-    private Double calculateAvgBeerPrice() {
+    public Double calculateAvgBeerPrice() {
         List<Beer> beers = beerRepository.findAll();
         double avgBeerPrice = beers.stream().map(beer -> beer.getPrice()).collect(Collectors.averagingDouble(value -> value.doubleValue()));
         return avgBeerPrice;
+    }
+
+    public Double calculateBeersValue() {
+        List<Beer> beers = beerRepository.findAll();
+        double BeersValue = beers.stream().map(beer -> beer.getPrice()*beer.getQuantity()).mapToDouble(value -> value.doubleValue()).sum();
+        return BeersValue;
+    }
+
+    public double calculatePotentialIncome(Report report) {
+        if(report.getPotentialIncome() == null){
+            report.setPotentialIncome(0.0);
+        }
+         return (report.getStartBeersValue() - calculateBeersValue()) * 0.94;
     }
 
     public Report updateReportData(Report report) {

@@ -5,6 +5,8 @@ import com.app.model.dto.BeerDto;
 import com.app.model.modelMappers.ModelMapper;
 import com.app.repository.BeerRepository;
 import com.app.utils.FileManager;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 

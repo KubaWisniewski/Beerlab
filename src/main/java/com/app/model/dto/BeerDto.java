@@ -16,4 +16,5 @@ public class BeerDto {
     private String brand;
     private Double price;
     private Integer quantity;
+    private Double minimalPrice;
 }
