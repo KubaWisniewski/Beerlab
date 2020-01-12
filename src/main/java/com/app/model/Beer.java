@@ -22,6 +22,8 @@ public class Beer {
     private String brand;
     private Double price;
     private Integer quantity;
+    private Double minimalPrice;
+
     @OneToMany(mappedBy = "order", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<OrderItem> orderItems = new LinkedList<>();
 
