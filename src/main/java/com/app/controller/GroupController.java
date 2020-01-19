@@ -64,7 +64,7 @@ public class GroupController {
             value = "Add user to the group ",
             response = Group.class
     )
-    @PutMapping("/addUser")
+    @PostMapping("/addUser")
     public GroupDto addUserToGroup(@RequestBody AddOrDeleteUserGroupPayload addOrDeleteUserGroupPayload) {
         return groupService.addUserToGroup(addOrDeleteUserGroupPayload.getEmail(), addOrDeleteUserGroupPayload.getGroupId());
     }
