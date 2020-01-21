@@ -123,7 +123,7 @@ public class GroupRestControllerIntegrationTest {
         Gson gsonBuilder = new GsonBuilder().create();
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         userRepository.save(User.builder().email("add@test.com").username("AddTest").roles(Collections.singletonList(roleRepository.findByRoleName(RoleName.ROLE_USER).get())).password(bCryptPasswordEncoder.encode("123")).balance(100.0).build());
-        mvc.perform(put("/api/group/addUser")
+        mvc.perform(post("/api/group/addUser")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-Auth-Token", getAuthToken())
                 .header("Accept", "application/json")
