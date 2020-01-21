@@ -51,7 +51,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/api/quiz/**","/api/auth/signin", "/api/auth/signup", "/", "/favicon.ico", "/**/*.png", "/**/*.gif", "/**/*.svg", "/**/*.jpg", "/**/*.html", "/**/*.css", "/**/*.js", "/h2-console/**")
                 .permitAll()
-                .antMatchers(HttpMethod.GET, "/api/beer").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/beer","/api/quiz/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .logout().logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler()).invalidateHttpSession(true).deleteCookies("JSESSIONID")
