@@ -5,31 +5,22 @@ jdk: openjdk8
 services:
   - docker
 
-install: /bin/true
-
 branches:
   only:
-    - /^master.*$/
+    - master
 
 stages:
   - name: Build-Application
   - name: Test
   - name: Build-Docker-Image
 
-before_install:
-  - docker build -t java-service .
-
-script:
-  - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
-  - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$PR, BRANCH=$BRANCH"
-
 jobs:
   include:
-    - stage: Build-Application
+    - stage: Compile-Application
       script: 
         - mvn compile
 
-    - stage: Test
+    - stage: Test-Application
       script: 
         - mvn test -B
 
