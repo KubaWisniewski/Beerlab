@@ -11,7 +11,7 @@ branches:
 
 stages:
   - name: Build-Application
-  - name: Test
+  - name: Test-Application
   - name: Build-Docker-Image
 
 jobs:
