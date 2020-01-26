@@ -166,7 +166,7 @@ public class QuizService {
     public UserAnswerDto voteOnAnswer(Long userId, Long answerId) {
         Answer answer = answerRepository.findById(answerId).orElseThrow(() -> new NullPointerException("Answer does not exist"));
         User user = userRepository.findById(userId).orElseThrow(() -> new NullPointerException("User does not exist"));
-        UserAnswer userAnswer = userAnswerRepository.findByQuestionId(answer.getQuestion().getId()).orElseThrow(() -> new NullPointerException("User Answer not init"));
+        UserAnswer userAnswer = userAnswerRepository.findByQuestionIdAndUserQuizId(answer.getQuestion().getId(),user.getUserQuizzes().stream().filter(x -> x.getQuiz().equals(answer.getQuestion().getQuiz())).findFirst().get().getId()).orElseThrow(() -> new NullPointerException("User Answer not init"));
         userAnswer.setAnswer(answer);
         userAnswerRepository.saveAndFlush(userAnswer);
         if (answer.isCorrect()) {
