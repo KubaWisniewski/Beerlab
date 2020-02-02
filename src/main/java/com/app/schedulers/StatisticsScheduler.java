@@ -49,17 +49,14 @@ public class StatisticsScheduler {
 
             for (int i = 0;i < beerlist.size();  i++) {
 
-                if(beerlist.get(i).getMinimalPrice() < beerlist.get(i).getPrice()) {
-
                     if (previousBeers.get(i).getQuantity() - beerlist.get(i).getQuantity() > 10) {
                         beerlist.get(i).setPrice(beerlist.get(i).getPrice() + 1);
-                    } else if (previousBeers.get(i).getQuantity() - beerlist.get(i).getQuantity() < 10) {
+                    } else if (previousBeers.get(i).getQuantity() - beerlist.get(i).getQuantity() < 10 && beerlist.get(i).getMinimalPrice() < beerlist.get(i).getPrice()) {
                         beerlist.get(i).setPrice(beerlist.get(i).getPrice() - 1);
                     }
                     Beer beer = modelMapper.fromBeerDtoToBeer(beerlist.get(i));
                     beerRepository.save(beer);
 
-                }
             }
 
         }
